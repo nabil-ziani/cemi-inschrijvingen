@@ -23,10 +23,10 @@ export default function Login({ searchParams }: { searchParams: { message: strin
         });
 
         if (error) {
-            return redirect("/login?message=Could not authenticate user");
+            return redirect("/sign-in?message=Could not authenticate user");
         }
 
-        return redirect("/login?message=Check email to continue sign in process");
+        return redirect("/sign-in?message=Check email to continue sign in process");
     };
 
     return (
@@ -59,7 +59,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
 
                     <p className="text-center text-sm text-gray-600">
                         {'Already have an account? '}
-                        <Link href="/login" className="font-semibold text-gray-800">
+                        <Link href="/sign-in" className="font-semibold text-gray-800">
                             Sign in
                         </Link>
                         {' instead.'}

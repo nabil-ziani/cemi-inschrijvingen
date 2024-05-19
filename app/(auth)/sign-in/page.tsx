@@ -15,7 +15,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect("/sign-in?message=Could not authenticate user");
     }
     // TODO: redirect to portal with overview of students
     return redirect("/protected");
@@ -51,7 +51,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
           </SubmitButton>
           <p className="text-center text-sm text-gray-600">
             {"Don't have an account? "}
-            <Link href="/register" className="font-semibold text-gray-800">
+            <Link href="/sign-up" className="font-semibold text-gray-800">
               Sign up
             </Link>
             {' for free.'}

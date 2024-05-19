@@ -9,7 +9,7 @@ export default async function StudentsPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-        return redirect("/login");
+        return redirect("/sign-in");
     }
 
     const { data: students } = await supabase.from('students').select()
