@@ -9,9 +9,6 @@ export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
     title: "CEMI",
     description: "Website voor leerlingen in te schrijven",
-    // icons: {
-    //   icon:
-    // }
 };
 
 const RootLayout = ({
@@ -20,7 +17,7 @@ const RootLayout = ({
     children: ReactNode;
 }>) => {
     return (
-        <main>
+        <main className='bg-gray-50'>
             {/* Provider?? */}
             {children}
         </main>

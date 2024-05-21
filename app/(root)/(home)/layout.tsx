@@ -10,7 +10,7 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
     title: "CEMI",
-    description: "Website voor leerlingen in te schrijven",
+    description: "CEMI app om een overzicht van de leerlingen te krijgen en inschrijvingen te beheren.",
     // icons: {
     //   icon:
     // }

@@ -1,12 +1,12 @@
 export const sidebarLinks = [
     {
-        label: 'Overzicht studenten',
+        label: 'Overzicht',
         route: '/',
-        imgUrl: '/icons/Home.svg',
+        imgUrl: '/icons/home.svg',
     },
     {
-        label: 'Nieuw toevoegen',
+        label: 'Nieuwe student',
         route: '/add-student',
-        imgUrl: '/icons/upcoming.svg',
+        imgUrl: '/icons/add-user.svg',
     }
 ]

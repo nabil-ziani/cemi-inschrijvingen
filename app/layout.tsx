@@ -15,9 +15,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "CEMI",
   description: "Website voor leerlingen in te schrijven",
-  // icons: {
-  //   icon:
-  // }
 };
 
 export default function RootLayout({
@@ -26,7 +23,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="nl" className={GeistSans.className} suppressHydrationWarning>
+    <html lang="nl" className={`${GeistSans.className} bg-gray-50`} suppressHydrationWarning>
       <body className="bg-background text-foreground">
         {children}
         <Toaster />
