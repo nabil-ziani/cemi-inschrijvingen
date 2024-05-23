@@ -3,6 +3,7 @@ import { prefetchQuery } from '@supabase-cache-helpers/postgrest-react-query'
 import { getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import Students from './students';
 
 export default async function Index() {
   const queryClient = new QueryClient()
@@ -20,10 +21,7 @@ export default async function Index() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-
+      <Students />
     </HydrationBoundary>
-    // <section className='flex size-full flex-col gap-10 text-white'>
-
-    // </section>
   );
 }

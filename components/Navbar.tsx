@@ -22,8 +22,8 @@ export default async function Navbar() {
             <Link href='/' className='flex items-center gap-1'>
                 <Image
                     src='/icons/logo.png'
-                    width={140}
-                    height={70}
+                    width={120}
+                    height={60}
                     alt='CEMI'
                     className='max-sm:size-10'
                 />

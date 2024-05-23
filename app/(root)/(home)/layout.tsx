@@ -28,7 +28,6 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
                     </div>
                 </section>
             </div>
-            Footer
         </main>
     );
 }
