@@ -1,9 +1,12 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-
-// import "react-datepicker/dist/react-datepicker.css";
+import ThemeProvider from '@/providers/ThemeProvider'
+import NextTopLoader from 'nextjs-toploader'
 import "./globals.css";
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import ReactQueryProvider from '@/providers/ReactQueryProvider'
+
 
 import { Toaster } from "@/components/ui/toaster";
 
@@ -23,10 +26,21 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${GeistSans.className} bg-gray-50`} suppressHydrationWarning>
+    <html lang="nl" className={GeistSans.className} style={{ colorScheme: 'light' }} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        {children}
-        <Toaster />
+        <NextTopLoader showSpinner={false} height={2} color="#e18438" />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ReactQueryProvider>
+            {children}
+            <Toaster />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

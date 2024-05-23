@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/react'
 import React, { ReactNode } from 'react'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -18,8 +19,8 @@ const RootLayout = ({
 }>) => {
     return (
         <main className='bg-gray-50'>
-            {/* Provider?? */}
             {children}
+            <Analytics />{' '}
         </main>
     );
 }
