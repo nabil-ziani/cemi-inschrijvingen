@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
     return (
-        <main className='relative'>
+        <main className='relative orange-light text-foreground bg-background'>
             <Navbar />
             <div className='flex'>
                 <Sidebar />

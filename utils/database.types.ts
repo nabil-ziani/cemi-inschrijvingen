@@ -6,16 +6,6 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type Enrollment = {
-  enrollmentid: string;
-  student: {
-    firstname: string;
-    lastname: string;
-  } | null;
-  payment_complete: boolean;
-  passed: boolean | null;
-}
-
 export type Database = {
   public: {
     Tables: {

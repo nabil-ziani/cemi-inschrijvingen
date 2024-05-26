@@ -1,47 +1,53 @@
-import { Button } from "@/components/ui/button"
+import React from "react";
+import { Input } from "@nextui-org/react";
+import { MailIcon } from '@/components/icons/MailIcon';
+import { EyeFilledIcon } from "@/components/icons/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "@/components/icons/EyeSlashFilledIcon";
 
-export function Form({
-    action,
-    children,
-}: {
+export function Form({ action, children }: {
     action: any;
     children: React.ReactNode;
 }) {
+    const [isVisible, setIsVisible] = React.useState(false);
+    const [value, setValue] = React.useState("");
+
+    const toggleVisibility = () => setIsVisible(!isVisible);
+
     return (
         <form
             action={action}
             className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16"
         >
             <div>
-                <label
-                    htmlFor="email"
-                    className="block text-xs text-gray-600 uppercase"
-                >
-                    Email
-                </label>
-                <input
-                    id="email"
-                    name="email"
+                <Input
+                    value={value}
                     type="email"
-                    placeholder="gebruiker@cemi-antwerp.be"
-                    autoComplete="email"
-                    required
-                    className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+                    label="Email"
+                    name="email"
+                    variant="bordered"
+                    onValueChange={setValue}
+                    className="max-w-xs"
+                    endContent={
+                        <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                    }
                 />
             </div>
             <div>
-                <label
-                    htmlFor="password"
-                    className="block text-xs text-gray-600 uppercase"
-                >
-                    Wachtwoord
-                </label>
-                <input
-                    id="password"
+                <Input
+                    label="Wachtwoord"
+                    variant="bordered"
                     name="password"
-                    type="password"
-                    required
-                    className="mt-1 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-black focus:outline-none focus:ring-black sm:text-sm"
+                    endContent={
+                        <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
+                            {isVisible ? (
+                                <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            ) : (
+                                <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                            )}
+                        </button>
+                    }
+                    type={isVisible ? "text" : "password"}
+                    className="max-w-xs"
                 />
             </div>
             {children}
