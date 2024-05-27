@@ -7,15 +7,15 @@ export const sidebarLinks = [
     {
         label: 'Nieuwe student',
         route: '/add-student',
-        imgUrl: '/icons/add-user.svg',
+        imgUrl: '/icons/members.svg',
     }
 ]
 
 export const columns = [
-    { name: "Naam", uid: "fullname", sortable: true },
-    { name: "lastname", uid: "lastname", sortable: true },
-    { name: "passed", uid: "passed", sortable: true },
-    { name: "payment_complete", uid: "payment_complete", sortable: true },
+    { name: "Naam", uid: "firstname", sortable: true },
+    { name: "Betaling", uid: "payment_complete", sortable: true },
+    { name: "Geslaagd", uid: "passed", sortable: true },
+    { name: "Acties", uid: "actions", sortable: false },
 ]
 
 export const statusOptions = [

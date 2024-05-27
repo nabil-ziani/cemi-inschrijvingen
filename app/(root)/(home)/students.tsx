@@ -1,7 +1,7 @@
 'use client'
 
 import { createClient } from "@/utils/supabase/client";
-import { getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
+import { Enrollment, getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
 import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
 import React from "react";
 import {
@@ -20,7 +20,6 @@ import {
     Chip,
     User,
     Pagination,
-    ChipProps,
     SortDescriptor,
     Selection,
     Tooltip
@@ -33,14 +32,15 @@ import { capitalize } from "@/lib/utils";
 import { EyeIcon } from "@/components/icons/ViewIcon"
 import { EditIcon } from "@/components/icons/EditIcon";
 import { DeleteIcon } from "@/components/icons/DeleteIcon";
+import { formatCurrency } from "@/utils/numberUtils";
 
-const statusColorMap: Record<string, ChipProps["color"]> = {
-    active: "success",
-    paused: "danger",
-    vacation: "warning",
-};
+// const statusColorMap: Record<string, ChipProps["color"]> = {
+//     active: "success",
+//     paused: "danger",
+//     vacation: "warning",
+// };
 
-const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
 export default function Students() {
     const [filterValue, setFilterValue] = React.useState("");
@@ -55,9 +55,8 @@ export default function Students() {
 
     const supabase = createClient()
     const { data, error } = useQuery(getEnrollmentsByYear(supabase, '2023'))
-    if (error) return
 
-    type Enrollment = any;
+    if (error) return
 
     const hasSearchFilter = Boolean(filterValue);
 
@@ -71,10 +70,18 @@ export default function Students() {
         let filteredEnrollments = [...data!];
 
         if (hasSearchFilter) {
-            filteredEnrollments = filteredEnrollments.filter((enrollment) =>
-                enrollment.student?.firstname.toLowerCase().includes(filterValue.toLowerCase()),
-            );
+            filteredEnrollments = filteredEnrollments.filter((enrollment) => {
+                const { student } = enrollment;
+                const filterValueLowerCase = filterValue.toLowerCase();
+
+                return (
+                    student?.firstname.toLowerCase().includes(filterValueLowerCase) ||
+                    student?.lastname.toLowerCase().includes(filterValueLowerCase) ||
+                    student?.email_1.toLowerCase().includes(filterValueLowerCase)
+                );
+            });
         }
+
         // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
         //     filteredEnrollments = filteredEnrollments.filter((enrollment) =>
         //         Array.from(statusFilter).includes(enrollment.status),
@@ -108,26 +115,25 @@ export default function Students() {
         console.log(columnKey)
 
         switch (columnKey) {
-            case "fullname":
+            case "firstname":
                 return (
                     <User
-                        description={enrollment.student.email}
-                        name={cellValue}
+                        description={enrollment.student?.email_1}
+                        name={`${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}`}
                     >
-                        {enrollment.student.email}
                     </User>
                 );
-            case "role":
+            case "passed":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-small capitalize">{cellValue}</p>
-                        <p className="text-bold text-tiny capitalize text-default-400">{enrollment.team}</p>
+                        {/* <p className="text-bold text-small capitalize">{cellValue == null && 'N/A'}</p> */}
+                        <p className="text-bold text-tiny capitalize text-default-400">{cellValue == null && 'N/A'}</p>
                     </div>
                 );
-            case "status":
+            case "payment_complete":
                 return (
-                    <Chip className="capitalize" color={statusColorMap[enrollment.status]} size="sm" variant="flat">
-                        {cellValue}
+                    <Chip className="capitalize" size="sm" variant="flat" color={cellValue ? 'success' : 'danger'}>
+                        {formatCurrency(enrollment.payment_amount)}
                     </Chip>
                 );
             case "actions":
@@ -138,12 +144,12 @@ export default function Students() {
                                 <EyeIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip content="Edit user">
+                        <Tooltip content="Wijzig">
                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <EditIcon />
                             </span>
                         </Tooltip>
-                        <Tooltip color="danger" content="Delete user">
+                        <Tooltip color="danger" content="Verwijder">
                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon />
                             </span>
@@ -193,7 +199,7 @@ export default function Students() {
                     <Input
                         isClearable
                         className="w-full sm:max-w-[44%]"
-                        placeholder="Search by name..."
+                        placeholder="Zoek op naam..."
                         startContent={<SearchIcon />}
                         value={filterValue}
                         onClear={() => onClear()}
@@ -248,9 +254,9 @@ export default function Students() {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Total {data!.length} users</span>
+                    <span className="text-default-400 text-small">Totaal: {data!.length} leerlingen</span>
                     <label className="flex items-center text-default-400 text-small">
-                        Aantal rijen:
+                        Aantal rijen:&nbsp;
                         <select
                             className="bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
@@ -296,7 +302,7 @@ export default function Students() {
             bottomContent={bottomContent}
             bottomContentPlacement="outside"
             classNames={{
-                wrapper: "max-h-[382px]",
+                wrapper: "max-h-[70vh]",
             }}
             selectionMode="multiple"
             sortDescriptor={sortDescriptor}

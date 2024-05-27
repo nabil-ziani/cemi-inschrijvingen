@@ -8,10 +8,7 @@ interface MoneyWithCurrencyProps {
 
 const MoneyWithCurrency = ({ amount }: MoneyWithCurrencyProps) => {
     return (
-        // logica moet anders voor woensdag- en zondagklas
-        <span className={cx({
-            'text-destructive': amount < 220
-        })}>
+        <span>
             {formatCurrency(amount)}
         </span>
     )
