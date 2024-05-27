@@ -4,12 +4,15 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
+import { SubmitHandler } from 'react-hook-form';
+import { SignInFormData } from '@/components/auth/SignIn';
+import { SignUpFormData } from '@/components/auth/SignUpForm';
 
-export async function signIn(formData: FormData) {
+export const signIn: SubmitHandler<SignInFormData> = async (formData) => {
     const supabase = createClient();
 
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const email = formData.email as string;
+    const password = formData.password as string;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
@@ -21,17 +24,14 @@ export async function signIn(formData: FormData) {
     redirect('/')
 };
 
-export async function signUp(formData: FormData) {
+export const signUp: SubmitHandler<SignUpFormData> = async (formData) => {
     const supabase = createClient()
 
-    // type-casting here for convenience
-    // in practice, you should validate your inputs
     const data = {
-        email: formData.get('email') as string,
-        password: formData.get('password') as string,
+        email: formData.email as string,
+        password: formData.password as string,
     }
 
-    console.log(data)
     const { error } = await supabase.auth.signUp(data)
 
     if (error) {

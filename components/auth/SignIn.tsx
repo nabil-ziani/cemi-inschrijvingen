@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
-import { Form } from "@/components/Form";
+import { SignInForm } from "@/components/auth/SignInForm";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
 import { signIn } from '@/app/(auth)/actions';
 import { NOTIFICATION_TYPE, Notification } from '@/components/Notification';
+
+export interface SignInFormData {
+    email: string;
+    password: string;
+}
 
 export function SignIn({ error }: { error: string }) {
     const [loading, setLoading] = useState(false)
@@ -35,7 +40,7 @@ export function SignIn({ error }: { error: string }) {
                     </p>
                 </div>
                 {errorMsg && <Notification type={NOTIFICATION_TYPE.error} message='Verkeerd email of wachtwoord ingegeven' />}
-                <Form action={async (formData: FormData) => {
+                <SignInForm action={async (formData: SignInFormData) => {
                     setLoading(true)
                     await signIn(formData)
                     setLoading(false)
@@ -47,7 +52,7 @@ export function SignIn({ error }: { error: string }) {
                             Registreer je hier.
                         </Link>
                     </p>
-                </Form>
+                </SignInForm>
             </div>
         </div >
     )

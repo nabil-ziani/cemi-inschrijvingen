@@ -1,4 +1,4 @@
-import { SignIn } from "@/components/SignIn";
+import { SignIn } from "@/components/auth/SignIn";
 
 export default function SignInPage({ searchParams }: { searchParams: { msg: string } }) {
   return (

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from "next/link";
 import { signUp } from '@/app/(auth)/actions'
-import { Form } from "@/components/Form";
+import { SignUpForm, SignUpFormData } from "@/components/auth/SignUpForm";
 import Image from "next/image";
 import { SubmitButton } from "@/components/SubmitButton";
 import { NOTIFICATION_TYPE, Notification } from '@/components/Notification';
@@ -42,7 +42,7 @@ export function SignUp({ error }: { error: string }) {
                 </div>
                 {errorMsg && <Notification type={NOTIFICATION_TYPE.error} message='Er ging iets mis bij het registreren' />}
 
-                <Form action={async (formData: FormData) => {
+                <SignUpForm action={async (formData: SignUpFormData) => {
                     setLoading(true)
                     await signUp(formData)
                     setLoading(false)
@@ -56,7 +56,7 @@ export function SignUp({ error }: { error: string }) {
                         </Link>
                         {''}
                     </p>
-                </Form>
+                </SignUpForm>
             </div>
         </div >
     )
