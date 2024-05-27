@@ -157,7 +157,7 @@ export default function Students() {
                     </div>
                 );
             default:
-                return cellValue;
+                return <span>{cellValue?.toString()}</span>;
         }
     }, []);
 
