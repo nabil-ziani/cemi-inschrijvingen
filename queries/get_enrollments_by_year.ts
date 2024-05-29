@@ -2,6 +2,7 @@ import { TypedSupabaseClient } from '@/utils/types'
 
 export type Enrollment = {
     enrollmentid: string;
+    studentid: string
     student: {
         firstname: string;
         lastname: string;
@@ -12,11 +13,13 @@ export type Enrollment = {
     passed: boolean | null;
 }
 
+// get only active students
 export function getEnrollmentsByYear(client: TypedSupabaseClient, year: string) {
     return client
         .from('enrollment')
         .select(`
             enrollmentid,
+            studentid,
             student(
                 firstname, 
                 lastname,
@@ -27,5 +30,6 @@ export function getEnrollmentsByYear(client: TypedSupabaseClient, year: string) 
             passed 
         `)
         .eq('year', year)
+        .eq('status', 'Heringeschreven')
         .throwOnError()
 }

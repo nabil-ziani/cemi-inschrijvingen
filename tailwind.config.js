@@ -22,9 +22,21 @@ module.exports = {
   darkMode: "class",
   plugins: [nextui({
     themes: {
-      "orange-light": {
-        extend: "light",
+      light: {
         colors: {
+          danger: {
+            50: "#fef2f2",
+            100: "#fee2e2",
+            200: "#fecaca",
+            300: "#fca5a5",
+            400: "#f87171",
+            500: "#ef4444",
+            600: "#dc2626",
+            700: "#b91c1c",
+            800: "#991b1b",
+            900: "#7f1d1d",
+            DEFAULT: '#dc2626'
+          },
           primary: {
             50: "#ffefdf",
             100: "#f9d5b8",

@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { Enrollment, getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
 import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
-import React from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     Table,
     TableHeader,
@@ -22,7 +22,8 @@ import {
     Pagination,
     SortDescriptor,
     Selection,
-    Tooltip
+    Tooltip,
+    useDisclosure
 } from "@nextui-org/react";
 import { PlusIcon } from "@/components/icons/PlusIcon";
 import { SearchIcon } from "@/components/icons/SearchIcon";
@@ -33,6 +34,7 @@ import { EyeIcon } from "@/components/icons/ViewIcon"
 import { EditIcon } from "@/components/icons/EditIcon";
 import { DeleteIcon } from "@/components/icons/DeleteIcon";
 import { formatCurrency } from "@/utils/numberUtils";
+import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
 
 // const statusColorMap: Record<string, ChipProps["color"]> = {
 //     active: "success",
@@ -43,30 +45,37 @@ import { formatCurrency } from "@/utils/numberUtils";
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
 export default function Students() {
-    const [filterValue, setFilterValue] = React.useState("");
-    const [visibleColumns, setVisibleColumns] = React.useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = React.useState<Selection>("all");
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-    const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    const [filterValue, setFilterValue] = useState("");
+    const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
+    const [statusFilter, setStatusFilter] = useState<Selection>("all");
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "age",
         direction: "ascending",
     });
-    const [page, setPage] = React.useState(1);
-
+    const [page, setPage] = useState(1);
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
     const supabase = createClient()
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const { data, error } = useQuery(getEnrollmentsByYear(supabase, '2023'))
 
     if (error) return
 
+    // MODAL
+    const handleOpen = () => {
+        onOpen();
+    }
+
     const hasSearchFilter = Boolean(filterValue);
 
-    const headerColumns = React.useMemo(() => {
+    const headerColumns = useMemo(() => {
         if (visibleColumns === "all") return columns;
 
         return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
     }, [visibleColumns]);
 
-    const filteredItems = React.useMemo(() => {
+    const filteredItems = useMemo(() => {
         let filteredEnrollments = [...data!];
 
         if (hasSearchFilter) {
@@ -93,14 +102,14 @@ export default function Students() {
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
-    const items = React.useMemo(() => {
+    const items = useMemo(() => {
         const start = (page - 1) * rowsPerPage;
         const end = start + rowsPerPage;
 
         return filteredItems.slice(start, end);
     }, [page, filteredItems, rowsPerPage]);
 
-    const sortedItems = React.useMemo(() => {
+    const sortedItems = useMemo(() => {
         return [...items].sort((a: Enrollment, b: Enrollment) => {
             const first = a[sortDescriptor.column as keyof Enrollment] as number;
             const second = b[sortDescriptor.column as keyof Enrollment] as number;
@@ -110,9 +119,8 @@ export default function Students() {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = React.useCallback((enrollment: Enrollment, columnKey: React.Key) => {
+    const renderCell = useCallback((enrollment: Enrollment, columnKey: React.Key) => {
         const cellValue = enrollment[columnKey as keyof Enrollment];
-        console.log(columnKey)
 
         switch (columnKey) {
             case "firstname":
@@ -150,35 +158,38 @@ export default function Students() {
                             </span>
                         </Tooltip>
                         <Tooltip color="danger" content="Verwijder">
-                            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                            <span onClick={() => {
+                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}` } })
+                                handleOpen()
+                            }} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <DeleteIcon />
                             </span>
                         </Tooltip>
-                    </div>
+                    </div >
                 );
             default:
                 return <span>{cellValue?.toString()}</span>;
         }
     }, []);
 
-    const onNextPage = React.useCallback(() => {
+    const onNextPage = useCallback(() => {
         if (page < pages) {
             setPage(page + 1);
         }
     }, [page, pages]);
 
-    const onPreviousPage = React.useCallback(() => {
+    const onPreviousPage = useCallback(() => {
         if (page > 1) {
             setPage(page - 1);
         }
     }, [page]);
 
-    const onRowsPerPageChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const onRowsPerPageChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         setRowsPerPage(Number(e.target.value));
         setPage(1);
     }, []);
 
-    const onSearchChange = React.useCallback((value?: string) => {
+    const onSearchChange = useCallback((value?: string) => {
         if (value) {
             setFilterValue(value);
             setPage(1);
@@ -187,12 +198,12 @@ export default function Students() {
         }
     }, []);
 
-    const onClear = React.useCallback(() => {
+    const onClear = useCallback(() => {
         setFilterValue("")
         setPage(1)
     }, [])
 
-    const topContent = React.useMemo(() => {
+    const topContent = useMemo(() => {
         return (
             <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
@@ -279,7 +290,7 @@ export default function Students() {
         hasSearchFilter,
     ]);
 
-    const bottomContent = React.useMemo(() => {
+    const bottomContent = useMemo(() => {
         return (
             <div className="py-2 px-2 flex m-auto items-center">
                 <Pagination
@@ -296,38 +307,44 @@ export default function Students() {
     }, [items.length, page, pages, hasSearchFilter]);
 
     return (
-        <Table
-            aria-label="Example table with custom cells, pagination and sorting"
-            isHeaderSticky
-            bottomContent={bottomContent}
-            bottomContentPlacement="outside"
-            classNames={{
-                wrapper: "max-h-[70vh]",
-            }}
-            selectionMode="multiple"
-            sortDescriptor={sortDescriptor}
-            topContent={topContent}
-            topContentPlacement="outside"
-            onSortChange={setSortDescriptor}
-        >
-            <TableHeader columns={headerColumns}>
-                {(column) => (
-                    <TableColumn
-                        key={column.uid}
-                        align={column.uid === "actions" ? "center" : "start"}
-                        allowsSorting={column.sortable}
-                    >
-                        {column.name}
-                    </TableColumn>
-                )}
-            </TableHeader>
-            <TableBody className="h-full" emptyContent={"No users found"} items={sortedItems}>
-                {(item) => (
-                    <TableRow key={item.enrollmentid}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                    </TableRow>
-                )}
-            </TableBody>
-        </Table>
+        <>
+            <Table
+                aria-label="Example table with custom cells, pagination and sorting"
+                isHeaderSticky
+                bottomContent={bottomContent}
+                bottomContentPlacement="outside"
+                classNames={{
+                    wrapper: "max-h-[70vh]",
+                }}
+                selectionMode="single"
+                sortDescriptor={sortDescriptor}
+                topContent={topContent}
+                topContentPlacement="outside"
+                onSortChange={setSortDescriptor}
+            // TODO: navigate to detail page
+            // onRowAction={(key) => alert(`Opening item ${ key }...`)}
+            >
+                <TableHeader columns={headerColumns}>
+                    {(column) => (
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                            allowsSorting={column.sortable}
+                        >
+                            {column.name}
+                        </TableColumn>
+                    )}
+                </TableHeader>
+                <TableBody className="h-full" emptyContent={"No users found"} items={sortedItems}>
+                    {(item) => (
+                        // Go to detail page onClick
+                        <TableRow key={item.enrollmentid} >
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        </TableRow>
+                    )}
+                </TableBody>
+            </Table>
+            <DeleteEnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} />
+        </>
     )
 }

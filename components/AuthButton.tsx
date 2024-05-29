@@ -22,7 +22,7 @@ export default async function AuthButton() {
   return user ? (
     <div className="flex items-center gap-4">
       <form action={signOut}>
-        <Button color="danger" variant="shadow" type="submit">
+        <Button color="danger" variant="solid" type="submit">
           <LogOutIcon className="mr-3 h-4 w-4" /> Afmelden
         </Button>
       </form>

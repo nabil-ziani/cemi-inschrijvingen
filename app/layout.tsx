@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-import NextTopLoader from 'nextjs-toploader'
+// import NextTopLoader from 'nextjs-toploader'
 import "./globals.css";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import ReactQueryProvider from '@/providers/ReactQueryProvider'

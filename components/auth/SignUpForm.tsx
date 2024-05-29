@@ -39,8 +39,6 @@ export function SignUpForm({ action, children }: FormProps) {
         mode: "onSubmit",
     });
 
-    console.log(errors)
-
     const toggleVisibility = () => setPasswordVisible(!passwordVisible);
     const toggleConfirmVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
 

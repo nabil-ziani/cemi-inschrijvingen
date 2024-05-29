@@ -52,14 +52,6 @@
 }
 
 /* styles.css */
-.filter-white {
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(360deg) brightness(100%) contrast(100%);
-}
-.filter-dark {
-  filter: invert(13%) sepia(3%) saturate(89%) hue-rotate(174deg) brightness(95%) contrast(93%);
-}
-
-
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;

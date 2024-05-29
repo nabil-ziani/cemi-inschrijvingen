@@ -18,7 +18,7 @@ const RootLayout = ({
     children: ReactNode;
 }>) => {
     return (
-        <main className='orange-light text-foreground bg-background'>
+        <main className='light text-foreground bg-background'>
             {children}
             <Analytics />{' '}
         </main>
