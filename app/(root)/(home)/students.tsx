@@ -35,6 +35,7 @@ import { EditIcon } from "@/components/icons/EditIcon";
 import { DeleteIcon } from "@/components/icons/DeleteIcon";
 import { formatCurrency } from "@/utils/numberUtils";
 import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
+import { useRouter } from "next/navigation";
 
 // const statusColorMap: Record<string, ChipProps["color"]> = {
 //     active: "success",
@@ -59,6 +60,7 @@ export default function Students() {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { data, error } = useQuery(getEnrollmentsByYear(supabase, '2023'))
+    const router = useRouter()
 
     if (error) return
 
@@ -259,9 +261,9 @@ export default function Students() {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Button color="primary" endContent={<PlusIcon />}>
+                        {/* <Button color="primary" endContent={<PlusIcon />}>
                             Nieuwe student
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
@@ -271,10 +273,10 @@ export default function Students() {
                         <select
                             className="bg-transparent outline-none text-default-400 text-small"
                             onChange={onRowsPerPageChange}
+                            defaultValue={10}
                         >
                             <option value="5">5</option>
                             <option value="10">10</option>
-                            <option value="15">15</option>
                         </select>
                     </label>
                 </div>
@@ -321,8 +323,8 @@ export default function Students() {
                 topContent={topContent}
                 topContentPlacement="outside"
                 onSortChange={setSortDescriptor}
-            // TODO: navigate to detail page
-            // onRowAction={(key) => alert(`Opening item ${ key }...`)}
+                // TODO: navigate to detail page
+                onRowAction={(key) => router.push(`/student/${key}`)}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (
@@ -338,12 +340,12 @@ export default function Students() {
                 <TableBody className="h-full" emptyContent={"No users found"} items={sortedItems}>
                     {(item) => (
                         // Go to detail page onClick
-                        <TableRow key={item.enrollmentid} >
+                        <TableRow key={item.studentid} >
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>
-            </Table>
+            </Table >
             <DeleteEnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} />
         </>
     )

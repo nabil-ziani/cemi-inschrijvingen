@@ -6,7 +6,7 @@ export const sidebarLinks = [
     },
     {
         label: 'Nieuwe student',
-        route: '/add-student',
+        route: '/student/1',
         imgUrl: '/icons/members.svg',
     }
 ]

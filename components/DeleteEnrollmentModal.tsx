@@ -17,7 +17,6 @@ const DeleteEnrollmentModal = ({ isOpen, onClose, enrollment }: DeleteEnrollment
 
     const enrollStudentOut = async (id: string) => {
         const { data, error: updateError } = await supabase.from('enrollment').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', id).eq('year', '2023').select()
-        console.log(data)
     }
 
     return (
