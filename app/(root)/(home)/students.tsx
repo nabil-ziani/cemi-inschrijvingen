@@ -36,6 +36,7 @@ import { DeleteIcon } from "@/components/icons/DeleteIcon";
 import { formatCurrency } from "@/utils/numberUtils";
 import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
 import { useRouter } from "next/navigation";
+import { UserCheck, UserPlusIcon, UserRoundCheck, UserRoundMinus, UserRoundPlus, UserRoundX, UserX } from "lucide-react";
 
 // const statusColorMap: Record<string, ChipProps["color"]> = {
 //     active: "success",
@@ -149,22 +150,19 @@ export default function Students() {
             case "actions":
                 return (
                     <div className="relative flex items-center gap-2">
-                        <Tooltip content="Details">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EyeIcon />
+                        <Tooltip content="Herinschrijven">
+                            <span onClick={() => {
+                                router.push(`/enrollment/${enrollment.studentid}`)
+                            }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                <UserCheck strokeWidth={1} />
                             </span>
                         </Tooltip>
-                        <Tooltip content="Wijzig">
-                            <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <EditIcon />
-                            </span>
-                        </Tooltip>
-                        <Tooltip color="danger" content="Verwijder">
+                        <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
                                 setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}` } })
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                <DeleteIcon />
+                                <UserX strokeWidth={1} />
                             </span>
                         </Tooltip>
                     </div >
