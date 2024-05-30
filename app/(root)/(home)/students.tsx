@@ -323,8 +323,8 @@ export default function Students() {
                 topContent={topContent}
                 topContentPlacement="outside"
                 onSortChange={setSortDescriptor}
-                // TODO: navigate to detail page
-                onRowAction={(key) => router.push(`/student/${key}`)}
+            // TODO: navigate to detail page
+            // onRowAction={(key) => router.push(`/student/${key}`)}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (

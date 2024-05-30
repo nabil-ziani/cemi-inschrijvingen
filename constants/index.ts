@@ -5,8 +5,8 @@ export const sidebarLinks = [
         imgUrl: '/icons/home.svg',
     },
     {
-        label: 'Nieuwe student',
-        route: '/student/1',
+        label: 'Inschrijving',
+        route: '/enrollment',
         imgUrl: '/icons/members.svg',
     }
 ]

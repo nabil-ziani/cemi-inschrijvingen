@@ -24,6 +24,7 @@ module.exports = {
     themes: {
       light: {
         colors: {
+          background: '#fefefe',
           danger: {
             50: "#fef2f2",
             100: "#fee2e2",
