@@ -152,7 +152,7 @@ export default function Students() {
                     <div className="relative flex items-center gap-2">
                         <Tooltip content="Herinschrijven">
                             <span onClick={() => {
-                                router.push(`/enrollment/${enrollment.studentid}`)
+                                router.push(`/enrollment/${enrollment.enrollmentid}`)
                             }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <UserCheck strokeWidth={1} />
                             </span>

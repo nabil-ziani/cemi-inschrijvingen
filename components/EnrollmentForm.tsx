@@ -1,21 +1,35 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, DateInput, Divider, Input, select } from '@nextui-org/react'
-import { CalendarDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, parseAbsoluteToLocal, parseDate, parseZonedDateTime, toCalendarDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
-import { I18nProvider } from "@react-aria/i18n";
+import { I18nProvider, useDateFormatter } from "@react-aria/i18n";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
-import { EditIcon, SaveAllIcon, SaveIcon } from 'lucide-react';
+import { EditIcon, SaveIcon } from 'lucide-react';
+import { capitalize } from '@/lib/utils';
+import { DatePicker } from "@nextui-org/react";
 
 type Level = {
     levelid: string
     name: "Tamhiedi" | "Niveau 1" | "Niveau 2" | "Niveau 3 - deel 1" | "Niveau 3 - deel 2" | "Niveau 4 - deel 1" | "Niveau 4 - deel 2"
 }
 
-const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
+interface EnrollmentFormProps {
+    levels: Array<Level> | null
+    enrollment?: any
+}
+
+const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
+    const [isDisabled, setIsDisabled] = useState(false);
     const [isSelected, setIsSelected] = useState(false);
+
+    useEffect(() => {
+        if (enrollment) {
+            setIsDisabled(true);
+        }
+    }, [enrollment]);
 
     return (
         <Card className='my-5 py-5 px-5 xl:max-w-[1800px]'>
@@ -23,7 +37,7 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                 <h2 className='font-semibold leading-none text-default-600'>
                     Persoonlijke informatie
                 </h2>
-                <Button color="primary" variant="flat">
+                <Button color="primary" variant="flat" onClick={() => setIsDisabled(false)}>
                     <EditIcon className="mr-2 h-4 w-4" /> Wijzigen
                 </Button>
             </CardHeader>
@@ -35,6 +49,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                defaultValue={enrollment ? capitalize(enrollment.student.firstname) : ''}
                                 type="text"
                                 name='firstname'
                                 label='Voornaam'
@@ -50,6 +66,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                defaultValue={enrollment ? capitalize(enrollment.student.lastname) : ''}
                                 type="text"
                                 name='lastname'
                                 label='Familienaam'
@@ -64,8 +82,10 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                     <div className="sm:col-span-2">
                         <div>
                             <I18nProvider locale="nl-BE">
-                                <DateInput
+                                <DatePicker
                                     isRequired
+                                    isDisabled={isDisabled}
+                                    defaultValue={enrollment ? parseDate(enrollment.student.birthdate) : null}
                                     placeholderValue={new CalendarDate(17, 11, 1997)}
                                     name='birthdate'
                                     label='Geboortedatum'
@@ -81,15 +101,17 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                     <div className="sm:col-span-2">
                         <div>
                             <Select
-                                className='text-sm font-medium leading-6'
                                 isRequired
+                                isDisabled={isDisabled}
+                                defaultSelectedKeys={enrollment ? [enrollment.class.level.levelid] : ''}
                                 name='level'
                                 label='Niveau'
                                 labelPlacement='outside'
                                 placeholder='Selecteer het niveau'
                                 color='default'
+                                className='text-sm font-medium leading-6'
                             >
-                                {data!.map((level) => (
+                                {levels!.map((level) => (
                                     <SelectItem key={level.levelid}>
                                         {level.name}
                                     </SelectItem>
@@ -102,6 +124,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.phone_1 : ''}
                                 type="text"
                                 name='phone1'
                                 label='Telefoon 1'
@@ -116,6 +140,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                     <div className="sm:col-span-2">
                         <div>
                             <Input
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.phone_2 : ''}
                                 type="text"
                                 name='phone2'
                                 label='Telefoon 2'
@@ -133,6 +159,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.email_1 : ''}
                                 type="text"
                                 name='email1'
                                 label='Email 1'
@@ -147,6 +175,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                     <div className="sm:col-span-2">
                         <div>
                             <Input
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.email_2 : ''}
                                 type="text"
                                 name='email2'
                                 label='Email 2'
@@ -158,13 +188,15 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         </div>
                     </div>
 
-                    <div className="sm:col-span-1 flex flex-col">
-                        <label htmlFor="homealone" className="block text-sm font-medium leading-6 text-default-600">
-                            Aleen naar huis?
-                        </label>
-                        <div className="mt-2">
-                            <Checkbox isSelected={isSelected} onValueChange={setIsSelected} aria-label='homealone' name='homealone'>
-                                <span className="text-default-400 text-small">{isSelected ? "Ja" : "Nee"}</span>
+                    <div className="sm:col-span-2 xl:col-span-1 flex flex-col items-center justify-center">
+                        <div className="mt-4">
+                            <Checkbox
+                                isSelected={isSelected} onValueChange={setIsSelected}
+                                isDisabled={isDisabled}
+                                defaultValue={enrollment ? enrollment?.student.homeAlone : false}
+                                name='homealone'
+                            >
+                                Alleen naar huis?
                             </Checkbox>
                         </div>
                     </div>
@@ -174,6 +206,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.street : ''}
                                 type="text"
                                 name='street'
                                 label='Straat'
@@ -189,6 +223,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div className="mt-2">
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.housenumber : ''}
                                 type="text"
                                 name='houseNumber'
                                 label='Huisnummer'
@@ -204,6 +240,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.postalcode : ''}
                                 type="text"
                                 name='postalCode'
                                 label='Postcode'
@@ -218,6 +256,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                         <div>
                             <Input
                                 isRequired
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.city : ''}
                                 type="text"
                                 name='city'
                                 label='Gemeente'
@@ -232,6 +272,8 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                     <div className="col-span-full">
                         <div>
                             <Textarea
+                                isDisabled={isDisabled}
+                                value={enrollment ? enrollment.student.remarks : ''}
                                 placeholder="Geef eventuele opmerkingen hier in"
                                 className="text-sm font-medium leading-6"
                                 label='Opmerkingen'
@@ -243,7 +285,7 @@ const EnrollmentForm = ({ data }: { data: Array<Level> | null }) => {
                 </div>
             </CardBody>
             <CardFooter className='flex justify-end items-center'>
-                <Button color="primary" variant="solid">
+                <Button color="primary" variant="solid" type='submit'>
                     <SaveIcon className="mr-2 h-4 w-4" /> Opslaan
                 </Button>
             </CardFooter>
