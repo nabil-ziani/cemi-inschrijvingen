@@ -44,7 +44,7 @@ export default function NotFoundPage() {
                                 <CardBody className="text-center p-8">
                                     <h3 className="text-2xl font-bold mb-4">Error</h3>
                                     <p className="">
-                                        Oeps, er is iets fout gegaan...
+                                        Oeps, deze pagina bestaat niet...
                                     </p>
                                 </CardBody>
                             </Card>
