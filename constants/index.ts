@@ -6,7 +6,7 @@ export const sidebarLinks = [
     },
     {
         label: 'Inschrijving',
-        route: '/enrollment/null',
+        route: '/enrollment/',
         imgUrl: '/icons/members.svg',
     }
 ]

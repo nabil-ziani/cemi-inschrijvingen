@@ -125,7 +125,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.phone_1 : ''}
+                                defaultValue={enrollment ? enrollment.student.phone_1 : ''}
                                 type="text"
                                 name='phone1'
                                 label='Telefoon 1'
@@ -141,7 +141,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         <div>
                             <Input
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.phone_2 : ''}
+                                defaultValue={enrollment ? enrollment.student.phone_2 : ''}
                                 type="text"
                                 name='phone2'
                                 label='Telefoon 2'
@@ -160,7 +160,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.email_1 : ''}
+                                defaultValue={enrollment ? enrollment.student.email_1 : ''}
                                 type="text"
                                 name='email1'
                                 label='Email 1'
@@ -176,7 +176,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         <div>
                             <Input
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.email_2 : ''}
+                                defaultValue={enrollment ? enrollment.student.email_2 : ''}
                                 type="text"
                                 name='email2'
                                 label='Email 2'
@@ -207,7 +207,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.street : ''}
+                                defaultValue={enrollment ? enrollment.student.street : ''}
                                 type="text"
                                 name='street'
                                 label='Straat'
@@ -224,7 +224,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.housenumber : ''}
+                                defaultValue={enrollment ? enrollment.student.housenumber : ''}
                                 type="text"
                                 name='houseNumber'
                                 label='Huisnummer'
@@ -241,7 +241,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.postalcode : ''}
+                                defaultValue={enrollment ? enrollment.student.postalcode : ''}
                                 type="text"
                                 name='postalCode'
                                 label='Postcode'
@@ -257,7 +257,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <Input
                                 isRequired
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.city : ''}
+                                defaultValue={enrollment ? enrollment.student.city : ''}
                                 type="text"
                                 name='city'
                                 label='Gemeente'
@@ -273,7 +273,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         <div>
                             <Textarea
                                 isDisabled={isDisabled}
-                                value={enrollment ? enrollment.student.remarks : ''}
+                                defaultValue={enrollment ? enrollment.student.remarks : ''}
                                 placeholder="Geef eventuele opmerkingen hier in"
                                 className="text-sm font-medium leading-6"
                                 label='Opmerkingen'
