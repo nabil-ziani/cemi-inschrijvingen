@@ -11,9 +11,6 @@ export const metadata: Metadata = {
     metadataBase: new URL(defaultUrl),
     title: "CEMI",
     description: "CEMI app om een overzicht van de leerlingen te krijgen en inschrijvingen te beheren.",
-    // icons: {
-    //   icon:
-    // }
 };
 
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {

@@ -1,8 +1,5 @@
 'use client'
 
-import { createClient } from "@/utils/supabase/client";
-import { Enrollment, getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
-import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
 import { useCallback, useMemo, useState } from "react";
 import {
     Table,
@@ -25,28 +22,23 @@ import {
     Tooltip,
     useDisclosure
 } from "@nextui-org/react";
-import { PlusIcon } from "@/components/icons/PlusIcon";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
-import { EyeIcon } from "@/components/icons/ViewIcon"
-import { EditIcon } from "@/components/icons/EditIcon";
-import { DeleteIcon } from "@/components/icons/DeleteIcon";
 import { formatCurrency } from "@/utils/numberUtils";
 import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
 import { useRouter } from "next/navigation";
-import { UserCheck, UserPlusIcon, UserRoundCheck, UserRoundMinus, UserRoundPlus, UserRoundX, UserX } from "lucide-react";
-
-// const statusColorMap: Record<string, ChipProps["color"]> = {
-//     active: "success",
-//     paused: "danger",
-//     vacation: "warning",
-// };
+import { UserCheck, UserX } from "lucide-react";
+import { Database } from "@/utils/database.types";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
-export default function Students() {
+interface StudentsProps {
+    data: Database['public']['Tables']['enrollment']['Row']
+}
+
+export default function Students({ data }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<Selection>("all");
@@ -57,13 +49,10 @@ export default function Students() {
     });
     const [page, setPage] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
-    const supabase = createClient()
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { data, error } = useQuery(getEnrollmentsByYear(supabase, '2023'))
-    const router = useRouter()
 
-    if (error) return
+    const router = useRouter()
 
     // MODAL
     const handleOpen = () => {
@@ -114,8 +103,8 @@ export default function Students() {
 
     const sortedItems = useMemo(() => {
         return [...items].sort((a: Enrollment, b: Enrollment) => {
-            const first = a[sortDescriptor.column as keyof Enrollment] as number;
-            const second = b[sortDescriptor.column as keyof Enrollment] as number;
+            const first = a[sortDescriptor.column as keyof Enrollment];
+            const second = b[sortDescriptor.column as keyof Enrollment];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;

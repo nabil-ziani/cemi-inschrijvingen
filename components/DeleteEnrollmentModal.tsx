@@ -2,7 +2,6 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from "@nextui-org/react";
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import { createClient } from "@/utils/supabase/client";
-import { unenrollStudent } from "@/queries/unenroll_student";
 
 interface DeleteEnrollmentModalProps {
     isOpen: boolean,
