@@ -2,44 +2,40 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { headers } from "next/headers";
 
 import { createClient } from '@/utils/supabase/server'
+import { SubmitHandler } from 'react-hook-form';
+import { SignInFormData } from '@/components/auth/SignIn';
+import { SignUpFormData } from '@/components/auth/SignUpForm';
 
-// TODO: validate inputs
-export async function signIn(formData: FormData) {
+export const signIn: SubmitHandler<SignInFormData> = async (formData) => {
     const supabase = createClient();
 
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const email = formData.email as string;
+    const password = formData.password as string;
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-        redirect('/error')
+        redirect('/sign-in?msg=invalid-credentials')
     }
 
     revalidatePath('/', 'layout')
     redirect('/')
 };
 
-export async function signUp(formData: FormData) {
+export const signUp: SubmitHandler<SignUpFormData> = async (formData) => {
     const supabase = createClient()
 
-    const origin = headers().get("origin");
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const data = {
+        email: formData.email as string,
+        password: formData.password as string,
+    }
 
-    const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-            emailRedirectTo: `${origin}/auth/callback`,
-        }
-    });
+    const { error } = await supabase.auth.signUp(data)
 
     if (error) {
-        redirect('/error')
+        redirect('/sign-up?msg=auth-error')
     }
 
     revalidatePath('/', 'layout')

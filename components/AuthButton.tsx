@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "./ui/button";
+import { Button } from "@nextui-org/button";
 import { LogOutIcon } from "lucide-react";
 
 export default async function AuthButton() {
@@ -22,7 +22,7 @@ export default async function AuthButton() {
   return user ? (
     <div className="flex items-center gap-4">
       <form action={signOut}>
-        <Button variant={"destructive"}>
+        <Button color="danger" variant="solid" type="submit">
           <LogOutIcon className="mr-3 h-4 w-4" /> Afmelden
         </Button>
       </form>

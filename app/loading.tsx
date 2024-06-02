@@ -2,10 +2,8 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, TransitionChild } from '@headlessui/react'
-import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react'
-import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 
-export default function NotFoundPage() {
+export default function Example() {
     const [open, setOpen] = useState(true)
 
     return (
@@ -34,20 +32,10 @@ export default function NotFoundPage() {
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Card>
-                                <CardHeader className='flex flex-col gap-5 m-auto'>
-                                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                        <ExclamationTriangleIcon className="h-7 w-7 text-red-600" aria-hidden="true" />
-                                    </div>
-                                </CardHeader>
-                                <Divider />
-                                <CardBody className="text-center p-8">
-                                    <h3 className="text-2xl font-bold mb-4">Error</h3>
-                                    <p className="">
-                                        Oeps, er is iets fout gegaan...
-                                    </p>
-                                </CardBody>
-                            </Card>
+                            <svg className="animate-spin -ml-1 mr-3 h-10 w-10 text-[#e18438]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                         </TransitionChild>
                     </div>
                 </div>

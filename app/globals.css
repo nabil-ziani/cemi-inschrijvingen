@@ -21,15 +21,37 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
+.animate-in {
+  animation: animateIn 0.3s ease 0.15s both;
+}
+
+@keyframes animateIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-out {
+  animation: animateOut 0.3s ease 0.15s both;
+}
+
+@keyframes animateOut {
+  from {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10);
+  }
+}
+
 /* styles.css */
-.filter-white {
-  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(360deg) brightness(100%) contrast(100%);
-}
-.filter-dark {
-  filter: invert(13%) sepia(3%) saturate(89%) hue-rotate(174deg) brightness(95%) contrast(93%);
-}
-
-
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;
