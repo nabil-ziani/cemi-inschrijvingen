@@ -46,10 +46,14 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
             ),
             payment_complete,
             payment_amount, 
-            passed 
+            passed, 
+            status
             `).eq('enrollmentid', id)
         }
     }
+
+    // TODOS: op deze pagina kom je een nieuwe inschrijving maken voor year: 2024
+    // 2 methodes te maken 'getOldEnrollment (2023) en makeNewEnrollment (2024)'
 
     const enrollment = await getCompleteEnrollment()
     const student = enrollment?.data![0].student
