@@ -34,7 +34,7 @@ interface EnrollmentFormProps {
 const formSchema = z.object({
     firstname: z.string(),
     lastname: z.string(),
-    birthdate: z.string(),
+    birthdate: z.date(),
     phone_1: z.string(),
     phone_2: z.string().optional(),
     email_1: z.string().email(),
@@ -55,28 +55,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     // zodra je op de pagina komt gaan we kijken of de student al een resultaat heeft en dit goed zetten 
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            firstname: enrollment ? capitalize(enrollment?.student?.firstname!) : '',
-            lastname: enrollment ? capitalize(enrollment?.student?.lastname!) : '',
-            birthdate: enrollment ? parseDate(enrollment?.student?.birthdate!).toString() : '',
-            phone_1: enrollment ? enrollment?.student?.phone_1 : '',
-            phone_2: enrollment ? enrollment?.student?.phone_2 : '',
-            email_1: enrollment ? enrollment?.student?.email_1 : '',
-            email_2: enrollment ? enrollment?.student?.email_2 : '',
-            homeAlone: enrollment ? enrollment?.student?.homeAlone : false,
-            street: enrollment ? enrollment?.student?.street : '',
-            housenumber: enrollment ? enrollment?.student?.housenumber : '',
-            postalcode: enrollment ? enrollment?.student?.postalcode : '',
-            city: enrollment ? enrollment?.student?.city : '',
-            remarks: enrollment ? enrollment?.student?.remarks : '',
-            level: enrollment ? enrollment?.class?.levelid : ''
-        }
-    });
+    const form = useForm<z.infer<typeof formSchema>>();
+    // { resolver: zodResolver(formSchema) }
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            console.log('Clicked!')
             console.log(values)
             // // Update or insert into student table
             // const { data: studentData, error: studentError } = await supabase
@@ -135,16 +119,16 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     return schoolResult !== null ? (
         <>
-            <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
+            {enrollment && <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
                 <CardHeader className='flex justify-between items-center'>
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-default-700'>
-                            <span className='font-bold'>{capitalize(enrollment?.student?.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel.name} en is <span className={`${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? 'geslaagd' : 'niet geslaagd'}</span>
+                            <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? 'geslaagd' : 'niet geslaagd'}</span>
                         </h2>
                     </div>
                 </CardHeader>
-            </Card>
+            </Card>}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <Card className='my-5 py-5 px-5 xl:max-w-[1800px]'>
@@ -303,7 +287,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            defaultValue={enrollment ? enrollment.student!.phone_2 : ''}
+                                                            defaultValue={enrollment && enrollment.student!.phone_2 || ''}
                                                             type="text"
                                                             name='phone_2'
                                                             label='Telefoon 2'
@@ -356,7 +340,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            defaultValue={enrollment ? enrollment.student!.email_2 : ''}
+                                                            defaultValue={enrollment && enrollment.student!.email_2 || ''}
                                                             type="text"
                                                             name='email_2'
                                                             label='Email 2'
@@ -405,7 +389,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            defaultValue={enrollment ? enrollment.student!.street : ''}
+                                                            defaultValue={enrollment && enrollment.student!.street || ''}
                                                             type="text"
                                                             name='street'
                                                             label='Straat'
@@ -431,7 +415,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            defaultValue={enrollment ? enrollment.student!.housenumber : ''}
+                                                            defaultValue={enrollment && enrollment.student!.housenumber || ''}
                                                             type="text"
                                                             name='housenumber'
                                                             label='Huisnummer'
@@ -457,7 +441,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            defaultValue={enrollment ? enrollment.student!.postalcode : ''}
+                                                            defaultValue={enrollment && enrollment.student!.postalcode || ''}
                                                             type="text"
                                                             name='postalcode'
                                                             label='Postcode'
@@ -482,7 +466,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            defaultValue={enrollment ? enrollment.student!.city : ''}
+                                                            defaultValue={enrollment && enrollment.student!.city || ''}
                                                             type="text"
                                                             name='city'
                                                             label='Gemeente'
@@ -507,7 +491,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Textarea
-                                                            defaultValue={enrollment ? enrollment.student!.remarks : ''}
+                                                            defaultValue={enrollment && enrollment.student!.remarks || ''}
                                                             placeholder="Geef eventuele opmerkingen hier in"
                                                             className="text-sm font-medium leading-6"
                                                             name='remarks'
@@ -533,26 +517,28 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             </Form >
         </>
     ) : (
-        <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
-            <CardHeader className='flex justify-between items-center'>
-                <div className='flex items-center'>
-                    <h2 className='mr-6 font-medium leading-none text-default-700'>
-                        Gelieve aan te geven of <span className='font-bold'>{capitalize(enrollment?.student?.firstname)}</span> geslaagd is:
-                    </h2>
-                    <Switch
-                        onValueChange={setPassedIsSelected}
-                        size='lg'
-                        color={'primary'}
-                        startContent={<Check />}
-                        endContent={<X />}
-                    />
-                    <p className={`ml-3 text-small ${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? "geslaagd" : "niet geslaagd"}</p>
-                </div>
-                <Button color="default" variant="flat" onClick={() => (setSchoolResult(passedIsSelected))}>
-                    Ga verder
-                </Button>
-            </CardHeader>
-        </Card>
+        <>
+            {enrollment && <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
+                <CardHeader className='flex justify-between items-center'>
+                    <div className='flex items-center'>
+                        <h2 className='mr-6 font-medium leading-none text-default-700'>
+                            Gelieve aan te geven of <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> geslaagd is:
+                        </h2>
+                        <Switch
+                            onValueChange={setPassedIsSelected}
+                            size='lg'
+                            color={'primary'}
+                            startContent={<Check />}
+                            endContent={<X />}
+                        />
+                        <p className={`ml-3 text-small ${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? "geslaagd" : "niet geslaagd"}</p>
+                    </div>
+                    <Button color="default" variant="flat" onClick={() => (setSchoolResult(passedIsSelected))}>
+                        Ga verder
+                    </Button>
+                </CardHeader>
+            </Card>}
+        </>
     )
 }
 

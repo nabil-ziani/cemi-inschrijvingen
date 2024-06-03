@@ -131,14 +131,14 @@ export type Database = {
         Insert: {
           birthdate?: string | null
           city?: string | null
-          email_1: string
+          email_1?: string
           email_2?: string | null
-          firstname: string
+          firstname?: string
           gender: Database["public"]["Enums"]["gender"]
           homeAlone?: boolean
           housenumber?: string | null
-          lastname: string
-          phone_1: string
+          lastname?: string
+          phone_1?: string
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string | null
