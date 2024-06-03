@@ -64,11 +64,11 @@ export interface EnrollmentWithStudentClass extends Enrollment {
 
 // FORM VALIDATION
 
-const EnrollmentStatusEnum = z.enum(["Heringeschreven", "Niet ingeschreven", "Onder voorbehoud"]);
-const ClassTimeEnum = z.enum(["VM", "MD", "NM"]);
-const ClassTypeEnum = z.enum(["Woensdag", "Zondag", "Weekend"]);
-const GenderEnum = z.enum(["m", "f"]);
-const LevelTypeEnum = z.enum(["Tamhiedi", "Niveau 1", "Niveau 2", "Niveau 3 - deel 1", "Niveau 3 - deel 2", "Niveau 4 - deel 1", "Niveau 4 - deel 2"]);
+export const EnrollmentStatusEnum = z.enum(["Heringeschreven", "Niet ingeschreven", "Onder voorbehoud"]);
+export const ClassTimeEnum = z.enum(["VM", "MD", "NM"]);
+export const ClassTypeEnum = z.enum(["Woensdag", "Zondag", "Weekend"]);
+export const GenderEnum = z.enum(["m", "f"]);
+export const LevelTypeEnum = z.enum(["Tamhiedi", "Niveau 1", "Niveau 2", "Niveau 3 - deel 1", "Niveau 3 - deel 2", "Niveau 4 - deel 1", "Niveau 4 - deel 2"]);
 
 export const EnrollmentSchema = z.object({
     classid: z.string().nullable(),
