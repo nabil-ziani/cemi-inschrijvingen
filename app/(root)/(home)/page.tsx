@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import Students from './students';
+import StudentsTable from '../../../components/StudentsTable';
 import { Divider } from "@nextui-org/react";
 
 export default async function Index() {
@@ -21,7 +21,7 @@ export default async function Index() {
       <h1 className='text-3xl font-bold mb-5'>Schooljaar 2023-2024</h1>
       <Divider className="my-5" />
       <div className="flex w-full flex-col gap-8">
-        <Students data={data} />
+        <StudentsTable data={data} />
       </div>
     </>
   );

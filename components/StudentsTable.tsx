@@ -30,15 +30,15 @@ import { formatCurrency } from "@/utils/numberUtils";
 import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
 import { useRouter } from "next/navigation";
 import { UserCheck, UserX } from "lucide-react";
-import { Database } from "@/utils/database.types";
+import { EnrollmentWithStudent } from "@/utils/types";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
 interface StudentsProps {
-    data: Database['public']['Tables']['enrollment']['Row']
+    data: EnrollmentWithStudent
 }
 
-export default function Students({ data }: StudentsProps) {
+export default function StudentsTable({ data }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<Selection>("all");

@@ -1,30 +1,49 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, DateInput, Divider, Input, select } from '@nextui-org/react'
-import { CalendarDate, getLocalTimeZone, parseAbsoluteToLocal, parseDate, parseZonedDateTime, toCalendarDate } from "@internationalized/date";
+import { useState } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
+import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
-import { I18nProvider, useDateFormatter } from "@react-aria/i18n";
+import { I18nProvider } from "@react-aria/i18n";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
-import { EditIcon, SaveIcon } from 'lucide-react';
+import { SaveIcon } from 'lucide-react';
 import { capitalize } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
-
-type Level = {
-    levelid: string
-    name: "Tamhiedi" | "Niveau 1" | "Niveau 2" | "Niveau 3 - deel 1" | "Niveau 3 - deel 2" | "Niveau 4 - deel 1" | "Niveau 4 - deel 2"
-}
+import { EnrollmentWithStudentClass, Level } from '@/utils/types';
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
-    enrollment?: any
+    enrollment: EnrollmentWithStudentClass | null
 }
+
+// *** ZOD VALIDATION ***
+const formSchema = z.object({
+    firstname: z.string(),
+})
+
+// TODO: als er reeds student is, is het simpel (enkel enrollment maken)
+// in het andere geval, maak eerst student aan en daarna enrollment
+
+// const createEnrollment = async (formData: FormData) => {
+//     // If ID is null then there is no existing student (new enrollment)
+//     if (id == 'null') {
+//         return null
+//     } else {
+//         return await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('enrollmentid', id)
+//     }
+// }
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const [isSelected, setIsSelected] = useState(false);
+    const [schoolResult, setSchoolResult] = useState<boolean>(false)
 
-    return (
+
+
+    return schoolResult ? (
         <Card className='my-5 py-5 px-5 xl:max-w-[1800px]'>
             <CardHeader className='flex justify-between items-center'>
                 <h2 className='font-semibold leading-none text-default-600'>
@@ -265,10 +284,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             </CardBody>
             <CardFooter className='flex justify-end items-center'>
                 <Button color="primary" variant="solid" type='submit'>
-                    <SaveIcon className="mr-2 h-4 w-4" /> Opslaan
+                    <SaveIcon className="mr-2 h-4 w-4" /> Herinschrijven
                 </Button>
             </CardFooter>
         </Card>
+    ) : (
+        <h1>Gelieve aan te geven of de leerling geslaagd is dit jaar?</h1>
     )
 }
 
