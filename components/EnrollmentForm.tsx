@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
-import { CalendarDate, parseDate } from "@internationalized/date";
+import { CalendarDate, getLocalTimeZone, now, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
 import { Select, SelectItem } from "@nextui-org/react";
@@ -36,17 +36,14 @@ const formSchema = z.object({
     postalcode: z.string(),
     city: z.string(),
     remarks: z.union([z.literal(''), z.string()]),
-    level: z.string().array()
+    level: z.string()
 });
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(false);
 
-    // zodra je op de pagina komt gaan we kijken of de student al een resultaat heeft en dit goed zetten 
-
     const supabase = createClient();
 
-    // TODO: verify enrollment should be the one from 2023 
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
     let newLevel: Level | undefined;
@@ -61,7 +58,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
         defaultValues: {
             firstname: enrollment && capitalize(enrollment?.student?.firstname!) || '',
             lastname: enrollment && capitalize(enrollment?.student?.lastname!) || '',
-            birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || undefined,
+            birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || new CalendarDate(2000, 1, 1),
             phone_1: enrollment && enrollment?.student?.phone_1 || '',
             phone_2: enrollment && enrollment?.student?.phone_2 || '',
             email_1: enrollment && enrollment?.student?.email_1 || '',
@@ -72,30 +69,30 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             postalcode: enrollment && enrollment?.student?.postalcode || '',
             city: enrollment && enrollment?.student?.city || '',
             remarks: enrollment && enrollment?.student?.remarks || '',
-            level: enrollment && newLevel?.levelid ? [newLevel.levelid] : []
+            level: enrollment && newLevel?.levelid ? newLevel.levelid : ''
         }
     });
 
+    // --- Make new enrollment for year 2024 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            console.log('Clicked!')
-            console.log(data)
-            // // Update or insert into student table
+            // If enrollment is null then we CREATE new student, otherwise UPDATE student
             // const { data: studentData, error: studentError } = await supabase
             //     .from('student')
             //     .upsert({
-            //         id: enrollment ? enrollment?.student?.id! : null,
+            //         studentid: enrollment ? enrollment.studentid : null,
+            //         gender: 'm',
             //         firstname: data.firstname,
             //         lastname: data.lastname,
             //         birthdate: data.birthdate,
-            //         phone_1: data.phone1,
-            //         phone_2: data.phone2,
-            //         email_1: data.email1,
-            //         email_2: data.email2,
-            //         homeAlone: data.homealone,
+            //         phone_1: data.phone_1,
+            //         phone_2: data.phone_2,
+            //         email_1: data.email_1,
+            //         email_2: data.email_2,
+            //         homeAlone: data.homeAlone,
             //         street: data.street,
-            //         housenumber: data.houseNumber,
-            //         postalcode: data.postalCode,
+            //         housenumber: data.housenumber,
+            //         postalcode: data.postalcode,
             //         city: data.city,
             //         remarks: data.remarks
             //     }, { onConflict: 'id' })
@@ -159,7 +156,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Voornaam'
                                                             labelPlacement='outside'
@@ -184,7 +182,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Familienaam'
                                                             labelPlacement='outside'
@@ -210,7 +209,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                         <I18nProvider locale="nl-BE">
                                                             <DatePicker
                                                                 isRequired
-                                                                {...field}
+                                                                value={field.value}
+                                                                onChange={field.onChange}
                                                                 placeholderValue={new CalendarDate(17, 11, 1997)}
                                                                 label='Geboortedatum'
                                                                 labelPlacement='outside'
@@ -267,7 +267,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Telefoon 1'
                                                             labelPlacement='outside'
@@ -291,7 +292,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Telefoon 2'
                                                             labelPlacement='outside'
@@ -318,7 +320,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Email 1'
                                                             labelPlacement='outside'
@@ -342,7 +345,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Email 2'
                                                             labelPlacement='outside'
@@ -366,7 +370,9 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Checkbox
-                                                            isSelected={aloneIsSelected} onValueChange={setAloneIsSelected}
+                                                            isSelected={aloneIsSelected}
+                                                            onValueChange={setAloneIsSelected}
+                                                            onChange={field.onChange}
                                                             checked={enrollment ? enrollment.student!.homeAlone : false}
                                                         >
                                                             Alleen naar huis?
@@ -389,7 +395,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Straat'
                                                             labelPlacement='outside'
@@ -414,7 +421,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Huisnummer'
                                                             labelPlacement='outside'
@@ -439,7 +447,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Postcode'
                                                             labelPlacement='outside'
@@ -463,7 +472,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <Input
                                                             isRequired
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             type="text"
                                                             label='Gemeente'
                                                             labelPlacement='outside'
@@ -487,7 +497,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Textarea
-                                                            {...field}
+                                                            value={field.value}
+                                                            onChange={field.onChange}
                                                             placeholder="Geef eventuele opmerkingen hier in"
                                                             className="text-sm font-medium leading-6"
                                                             label='Opmerkingen'
