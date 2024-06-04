@@ -7,14 +7,12 @@ import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
 import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
-import { Check, X } from 'lucide-react';
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
 import { EnrollmentWithStudentClass, Level } from '@/utils/types';
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Switch } from "@nextui-org/react";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 
 interface EnrollmentFormProps {
@@ -115,17 +113,17 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
         }
     };
 
-    // enrollment should be the one from 2023 
+    // TODO: verify enrollment should be the one from 2023 
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
     let newLevel: Level | undefined;
-    if (schoolResult) {
+    if (enrollment?.passed) {
         newLevel = getNextLevel(levels!, currentLevel?.levelid!)
     } else {
         newLevel = currentLevel
     }
 
-    return schoolResult !== null ? (
+    return (
         <>
             {enrollment && <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
                 <CardHeader className='flex justify-between items-center'>
@@ -509,29 +507,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     </Card>
                 </form>
             </Form >
-        </>
-    ) : (
-        <>
-            {enrollment && <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
-                <CardHeader className='flex justify-between items-center'>
-                    <div className='flex items-center'>
-                        <h2 className='mr-6 font-medium leading-none text-default-700'>
-                            Gelieve aan te geven of <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> geslaagd is:
-                        </h2>
-                        <Switch
-                            onValueChange={setPassedIsSelected}
-                            size='lg'
-                            color={'primary'}
-                            startContent={<Check />}
-                            endContent={<X />}
-                        />
-                        <p className={`ml-3 text-small ${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? "geslaagd" : "niet geslaagd"}</p>
-                    </div>
-                    <Button color="default" variant="flat" onClick={() => (setSchoolResult(passedIsSelected))}>
-                        Ga verder
-                    </Button>
-                </CardHeader>
-            </Card>}
         </>
     )
 }
