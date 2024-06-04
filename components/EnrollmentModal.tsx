@@ -5,7 +5,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Switc
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import { createClient } from "@/utils/supabase/client";
 import { Check, GraduationCap, X } from "lucide-react";
-
+import Link from 'next/link';
 interface DeleteEnrollmentModalProps {
     isOpen: boolean,
     onClose: () => void,
@@ -29,11 +29,11 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
     }
 
     const updateSchoolResult = async () => {
-        const { data, error } = await supabase.from('enrollment').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
-
-        if (error) {
-            console.log(error)
-        }
+        // const { data, error } = await supabase.from('enrollment').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
+        console.log('Clicked!')
+        // if (error) {
+        //     console.log(error)
+        // }
     }
 
     return (
@@ -82,7 +82,9 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
                                             Ga terug
                                         </Button>
                                         <Button color='primary' radius="full" onClick={updateSchoolResult}>
-                                            Verdergaan
+                                            <Link href={`/enrollment/${enrollment.id}`}>
+                                                Verdergaan
+                                            </Link>
                                         </Button>
                                     </>
 

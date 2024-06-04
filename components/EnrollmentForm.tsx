@@ -14,6 +14,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
+import { createClient } from '@/utils/supabase/client';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -40,10 +41,10 @@ const formSchema = z.object({
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(false);
-    const [passedIsSelected, setPassedIsSelected] = useState(false);
-    const [schoolResult, setSchoolResult] = useState<boolean | null>(null)
 
     // zodra je op de pagina komt gaan we kijken of de student al een resultaat heeft en dit goed zetten 
+
+    const supabase = createClient();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -65,9 +66,9 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
         }
     });
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            console.log(values)
+            console.log(data)
             // // Update or insert into student table
             // const { data: studentData, error: studentError } = await supabase
             //     .from('student')
@@ -130,7 +131,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-default-700'>
                             <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? 'geslaagd' : 'niet geslaagd'}</span>
+                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                         </h2>
                     </div>
                 </CardHeader>
