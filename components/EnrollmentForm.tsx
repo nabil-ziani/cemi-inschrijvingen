@@ -15,15 +15,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Switch } from "@nextui-org/react";
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -34,17 +26,17 @@ interface EnrollmentFormProps {
 const formSchema = z.object({
     firstname: z.string(),
     lastname: z.string(),
-    birthdate: z.date(),
+    birthdate: z.string(),
     phone_1: z.string(),
-    phone_2: z.string().optional(),
+    phone_2: z.union([z.literal(''), z.string()]),
     email_1: z.string().email(),
-    email_2: z.string().email().optional(),
+    email_2: z.union([z.literal(''), z.string().email()]),
     homeAlone: z.boolean(),
     street: z.string(),
     housenumber: z.string(),
     postalcode: z.string(),
     city: z.string(),
-    remarks: z.string().optional(),
+    remarks: z.union([z.literal(''), z.string()]),
     level: z.string()
 });
 
@@ -55,12 +47,28 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     // zodra je op de pagina komt gaan we kijken of de student al een resultaat heeft en dit goed zetten 
 
-    const form = useForm<z.infer<typeof formSchema>>();
-    // { resolver: zodResolver(formSchema) }
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            firstname: enrollment && capitalize(enrollment?.student?.firstname!) || '',
+            lastname: enrollment && capitalize(enrollment?.student?.lastname!) || '',
+            birthdate: enrollment && parseDate(enrollment?.student?.birthdate!).toString() || undefined,
+            phone_1: enrollment && enrollment?.student?.phone_1 || '',
+            phone_2: enrollment && enrollment?.student?.phone_2 || '',
+            email_1: enrollment && enrollment?.student?.email_1 || '',
+            email_2: enrollment && enrollment?.student?.email_2 || '',
+            homeAlone: enrollment && enrollment?.student?.homeAlone || false,
+            street: enrollment && enrollment?.student?.street || '',
+            housenumber: enrollment && enrollment?.student?.housenumber || '',
+            postalcode: enrollment && enrollment?.student?.postalcode || '',
+            city: enrollment && enrollment?.student?.city || '',
+            remarks: enrollment && enrollment?.student?.remarks || '',
+            level: enrollment && enrollment?.class?.levelid || ''
+        }
+    });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            console.log('Clicked!')
             console.log(values)
             // // Update or insert into student table
             // const { data: studentData, error: studentError } = await supabase
@@ -153,7 +161,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment ? capitalize(enrollment.student!.firstname) : ''}
                                                             type="text"
-                                                            name='firstname'
                                                             label='Voornaam'
                                                             labelPlacement='outside'
                                                             placeholder='Voornaam'
@@ -179,7 +186,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment ? capitalize(enrollment.student!.lastname) : ''}
                                                             type="text"
-                                                            name='lastname'
                                                             label='Familienaam'
                                                             labelPlacement='outside'
                                                             placeholder='Familienaam'
@@ -206,7 +212,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                                 isRequired
                                                                 defaultValue={enrollment ? parseDate(enrollment.student!.birthdate!) : null}
                                                                 placeholderValue={new CalendarDate(17, 11, 1997)}
-                                                                name='birthdate'
                                                                 label='Geboortedatum'
                                                                 labelPlacement='outside'
                                                                 className='text-sm font-medium leading-6'
@@ -232,7 +237,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                         <Select
                                                             isRequired
                                                             defaultSelectedKeys={newLevel?.levelid ? [newLevel.levelid] : []}
-                                                            name='level'
                                                             label='Niveau'
                                                             labelPlacement='outside'
                                                             placeholder='Selecteer het niveau'
@@ -264,7 +268,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment ? enrollment.student!.phone_1 : ''}
                                                             type="text"
-                                                            name='phone_1'
                                                             label='Telefoon 1'
                                                             labelPlacement='outside'
                                                             placeholder='+32 XXX XX XX XX'
@@ -289,7 +292,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                         <Input
                                                             defaultValue={enrollment && enrollment.student!.phone_2 || ''}
                                                             type="text"
-                                                            name='phone_2'
                                                             label='Telefoon 2'
                                                             labelPlacement='outside'
                                                             placeholder='+32 XXX XX XX XX'
@@ -317,7 +319,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment ? enrollment.student!.email_1 : ''}
                                                             type="text"
-                                                            name='email_1'
                                                             label='Email 1'
                                                             labelPlacement='outside'
                                                             placeholder='gebruiker@cemi-antwerp.be'
@@ -342,7 +343,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                         <Input
                                                             defaultValue={enrollment && enrollment.student!.email_2 || ''}
                                                             type="text"
-                                                            name='email_2'
                                                             label='Email 2'
                                                             labelPlacement='outside'
                                                             placeholder='gebruiker@cemi-antwerp.be'
@@ -367,7 +367,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                         <Checkbox
                                                             isSelected={aloneIsSelected} onValueChange={setAloneIsSelected}
                                                             checked={enrollment ? enrollment.student!.homeAlone : false}
-                                                            name='homeAlone'
                                                         >
                                                             Alleen naar huis?
                                                         </Checkbox>
@@ -391,7 +390,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment && enrollment.student!.street || ''}
                                                             type="text"
-                                                            name='street'
                                                             label='Straat'
                                                             labelPlacement='outside'
                                                             placeholder='Straat'
@@ -417,7 +415,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment && enrollment.student!.housenumber || ''}
                                                             type="text"
-                                                            name='housenumber'
                                                             label='Huisnummer'
                                                             labelPlacement='outside'
                                                             placeholder='XX'
@@ -443,7 +440,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment && enrollment.student!.postalcode || ''}
                                                             type="text"
-                                                            name='postalcode'
                                                             label='Postcode'
                                                             labelPlacement='outside'
                                                             placeholder='XXXX'
@@ -468,7 +464,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             isRequired
                                                             defaultValue={enrollment && enrollment.student!.city || ''}
                                                             type="text"
-                                                            name='city'
                                                             label='Gemeente'
                                                             labelPlacement='outside'
                                                             placeholder='Gemeente'
@@ -494,7 +489,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             defaultValue={enrollment && enrollment.student!.remarks || ''}
                                                             placeholder="Geef eventuele opmerkingen hier in"
                                                             className="text-sm font-medium leading-6"
-                                                            name='remarks'
                                                             label='Opmerkingen'
                                                             labelPlacement='outside'
                                                             color='default'

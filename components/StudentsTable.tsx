@@ -27,10 +27,10 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
 import { useRouter } from "next/navigation";
 import { UserCheck, UserX } from "lucide-react";
 import { EnrollmentWithStudent } from "@/utils/types";
+import EnrollmentModal from "./EnrollmentModal";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
@@ -49,6 +49,7 @@ export default function StudentsTable({ data }: StudentsProps) {
     });
     const [page, setPage] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
+    const [modalType, setModalType] = useState<'delete' | 'update'>('')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -141,14 +142,17 @@ export default function StudentsTable({ data }: StudentsProps) {
                     <div className="relative flex items-center gap-2">
                         <Tooltip content="Herinschrijven">
                             <span onClick={() => {
-                                router.push(`/enrollment/${enrollment.enrollmentid}`)
+                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                setModalType('update')
+                                handleOpen()
                             }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
                                 <UserCheck strokeWidth={1} />
                             </span>
                         </Tooltip>
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}` } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <UserX strokeWidth={1} />
@@ -333,7 +337,7 @@ export default function StudentsTable({ data }: StudentsProps) {
                     )}
                 </TableBody>
             </Table >
-            <DeleteEnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} />
+            <EnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} type={modalType} />
         </>
     )
 }
