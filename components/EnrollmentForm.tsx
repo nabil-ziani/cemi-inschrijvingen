@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Divider, Input } from '@nextui-org/react'
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Divider, Input, Switch } from '@nextui-org/react'
 import { CalendarDate, getLocalTimeZone, now, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -9,12 +9,14 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
-import { EnrollmentWithStudentClass, Level } from '@/utils/types';
+import { EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { createClient } from '@/utils/supabase/client';
+import { SubmitButton } from './SubmitButton';
+import { useRouter } from 'next/navigation';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -25,6 +27,7 @@ interface EnrollmentFormProps {
 const formSchema = z.object({
     firstname: z.string(),
     lastname: z.string(),
+    gender: z.boolean(),
     birthdate: z.instanceof(CalendarDate),
     phone_1: z.string(),
     phone_2: z.union([z.literal(''), z.string()]),
@@ -40,9 +43,12 @@ const formSchema = z.object({
 });
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
-    const [aloneIsSelected, setAloneIsSelected] = useState(false);
+    const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
+    const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
+    const [loading, setLoading] = useState(false)
 
     const supabase = createClient();
+    const router = useRouter()
 
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
@@ -59,6 +65,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             firstname: enrollment && capitalize(enrollment?.student?.firstname!) || '',
             lastname: enrollment && capitalize(enrollment?.student?.lastname!) || '',
             birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || new CalendarDate(2000, 1, 1),
+            gender: enrollment && enrollment?.student?.gender == 'f' ? true : false || false,
             phone_1: enrollment && enrollment?.student?.phone_1 || '',
             phone_2: enrollment && enrollment?.student?.phone_2 || '',
             email_1: enrollment && enrollment?.student?.email_1 || '',
@@ -76,49 +83,59 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     // --- Make new enrollment for year 2024 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
-            // If enrollment is null then we CREATE new student, otherwise UPDATE student
-            // const { data: studentData, error: studentError } = await supabase
-            //     .from('student')
-            //     .upsert({
-            //         studentid: enrollment ? enrollment.studentid : null,
-            //         gender: 'm',
-            //         firstname: data.firstname,
-            //         lastname: data.lastname,
-            //         birthdate: data.birthdate,
-            //         phone_1: data.phone_1,
-            //         phone_2: data.phone_2,
-            //         email_1: data.email_1,
-            //         email_2: data.email_2,
-            //         homeAlone: data.homeAlone,
-            //         street: data.street,
-            //         housenumber: data.housenumber,
-            //         postalcode: data.postalcode,
-            //         city: data.city,
-            //         remarks: data.remarks
-            //     }, { onConflict: 'id' })
-            //     .select();
+            // If enrollment is null, new student will be created otherwise linked student will be updated
+            // If gender = true, send 'f' otherwise 'm'
+            setLoading(true);
 
-            // if (studentError) throw studentError;
+            const { data: studentData, error: studentError } = await supabase
+                .from('student')
+                .upsert({
+                    studentid: enrollment ? enrollment.studentid : undefined,
+                    firstname: data.firstname,
+                    lastname: data.lastname,
+                    gender: genderIsSelected ? 'f' : 'm',
+                    birthdate: data.birthdate.toString(),
+                    phone_1: data.phone_1,
+                    phone_2: data.phone_2,
+                    email_1: data.email_1,
+                    email_2: data.email_2,
+                    homeAlone: data.homeAlone,
+                    street: data.street,
+                    housenumber: data.housenumber,
+                    postalcode: data.postalcode,
+                    city: data.city,
+                    remarks: data.remarks
+                }, { onConflict: 'id' })
+                .select();
 
-            // const studentId = studentData[0].id;
+            if (studentError) throw studentError;
 
-            // // Update or insert into enrollment table
-            // const { data: enrollmentData, error: enrollmentError } = await supabase
-            //     .from('enrollment')
-            //     .upsert({
-            //         id: enrollment ? enrollment.id : null,
-            //         student_id: studentId,
-            //         class_id: data.level,
-            //         school_year: '2023-2024'
-            //     }, { onConflict: 'id' })
-            //     .select();
+            // TODO: add toast 'Nieuwe student is succesvol aangemaakt!'
 
-            // if (enrollmentError) throw enrollmentError;
+            const studentId = studentData[0].studentid;
 
-            // alert('Enrollment updated successfully!');
+            const { data: enrollmentData, error: enrollmentError } = await supabase
+                .from('enrollment')
+                .upsert({
+                    enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
+                    studentid: studentId,
+                    classid: null,
+                    year: 2024,
+                    // payment_amount: 
+                    status: EnrollmentStatusEnum.Enum.Heringeschreven
+                }, { onConflict: 'id' })
+                .select();
+
+            if (enrollmentError) throw enrollmentError;
+
+            // TODO: add toast 'Inschrijving voor ${full_name} is in orde!'
+
         } catch (error: any) {
             console.error('Error updating enrollment:', error.message);
             alert('Failed to update enrollment');
+        } finally {
+            setLoading(false)
+            router.push('/')
         }
     };
 
@@ -141,6 +158,29 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             <h2 className='font-semibold leading-none text-default-600 text-lg'>
                                 Persoonlijke informatie
                             </h2>
+                            <div>
+                                <FormField
+                                    control={form.control}
+                                    name='gender'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormControl>
+                                                <div className='flex gap-3 items-center'>
+                                                    <Chip className={`${genderIsSelected ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                        {genderIsSelected ? 'Meisje' : 'Jongen'}
+                                                    </Chip>
+                                                    <Switch
+                                                        onValueChange={setGenderIsSelected}
+                                                        onChange={field.onChange}
+                                                        size='md'
+                                                        color='default'>
+                                                    </Switch>
+                                                </div>
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </CardHeader>
                         <Divider />
                         <CardBody>
@@ -514,9 +554,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             </div>
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
-                            <Button color="primary" variant="solid" type='submit'>
-                                Herinschrijven
-                            </Button>
+                            <SubmitButton text={loading ? 'Laden...' : 'Herinschrijven'} loading={loading} />
                         </CardFooter>
                     </Card>
                 </form>
