@@ -4,11 +4,9 @@ import { redirect } from 'next/navigation';
 import EnrollmentForm from '@/components/EnrollmentForm';
 import { capitalize } from '@/lib/utils';
 import { EnrollmentWithStudentClass } from '@/utils/types';
-import { useToast } from '@/components/ui/use-toast';
 
 const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) => {
     const supabase = createClient();
-    const { toast } = useToast()
 
     // --- Auth protect page ---
     const { data: { user } } = await supabase.auth.getUser();
@@ -19,10 +17,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     const { data: levels, error: levelsError } = await supabase.from('level').select()
 
     if (levelsError) {
-        toast({
-            title: "Oeps, er ging iets mis bij het ophalen van de niveau's",
-            description: levelsError.message,
-        })
+        throw new Error("Error fetching levels" + levelsError);
     }
 
     // --- Get old enrollment to prefill form with existing data ---

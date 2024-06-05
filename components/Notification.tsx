@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { XCircleIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/react/20/solid'
 
 export enum NOTIFICATION_TYPE { success, warning, error, info }
