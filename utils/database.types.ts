@@ -124,7 +124,7 @@ export type Database = {
           phone_1: string
           phone_2: string | null
           postalcode: string | null
-          remarks: string | null
+          remarks: string
           street: string | null
           studentid: string
         }
@@ -141,7 +141,7 @@ export type Database = {
           phone_1?: string
           phone_2?: string | null
           postalcode?: string | null
-          remarks?: string | null
+          remarks?: string
           street?: string | null
           studentid?: string
         }
@@ -158,7 +158,7 @@ export type Database = {
           phone_1?: string
           phone_2?: string | null
           postalcode?: string | null
-          remarks?: string | null
+          remarks?: string
           street?: string | null
           studentid?: string
         }

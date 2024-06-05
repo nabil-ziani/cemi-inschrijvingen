@@ -43,7 +43,7 @@ export interface Student {
     phone_1: string
     phone_2: string | null
     postalcode: string | null
-    remarks: string | null
+    remarks: string
     street: string | null
     studentid: string
 }
