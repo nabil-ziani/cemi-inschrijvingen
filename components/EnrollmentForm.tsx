@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { createClient } from '@/utils/supabase/client';
 import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
+import { MailIcon } from './icons/MailIcon';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -39,6 +40,7 @@ const formSchema = z.object({
     postalcode: z.string(),
     city: z.string(),
     remarks: z.union([z.literal(''), z.string()]),
+    payment_amount: z.number(),
     level: z.string()
 });
 
@@ -76,11 +78,13 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             postalcode: enrollment && enrollment?.student?.postalcode || '',
             city: enrollment && enrollment?.student?.city || '',
             remarks: enrollment && enrollment?.student?.remarks || '',
+            payment_amount: enrollment && enrollment?.payment_amount || 0,
             level: enrollment && newLevel?.levelid ? newLevel.levelid : ''
         }
     });
 
     // --- Make new enrollment for year 2024 ---
+    // Payment_amount will increase €20 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             // If enrollment is null, new student will be created otherwise linked student will be updated
@@ -105,7 +109,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     postalcode: data.postalcode,
                     city: data.city,
                     remarks: data.remarks
-                }, { onConflict: 'id' })
+                }, { onConflict: 'studentid' })
                 .select();
 
             if (studentError) throw studentError;
@@ -121,9 +125,10 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     studentid: studentId,
                     classid: null,
                     year: 2024,
-                    // payment_amount: 
+                    passed: null,
+                    payment_amount: data.payment_amount,
                     status: EnrollmentStatusEnum.Enum.Heringeschreven
-                }, { onConflict: 'id' })
+                }, { onConflict: 'enrollmentid' })
                 .select();
 
             if (enrollmentError) throw enrollmentError;
@@ -131,11 +136,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             // TODO: add toast 'Inschrijving voor ${full_name} is in orde!'
 
         } catch (error: any) {
+            // TODO: add toast 'Er lijkt iets mis te zijn gegaan tijdens het inschrijven..'
             console.error('Error updating enrollment:', error.message);
             alert('Failed to update enrollment');
         } finally {
             setLoading(false)
-            router.push('/')
+            // router.push('/')
         }
     };
 
@@ -265,8 +271,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                     </div>
                                 </div>
 
-                                {/* Niveau - Telefoon 1 - Telefoon 2 */}
-                                <div className="sm:col-span-2">
+                                {/* Niveau - Betaling - Telefoon 1 - Telefoon 2 */}
+                                <div className="sm:col-span-1">
                                     <div>
                                         <FormField
                                             control={form.control}
@@ -290,6 +296,37 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                                 </SelectItem>
                                                             ))}
                                                         </Select>
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="col-span-1">
+                                    <div>
+                                        <FormField
+                                            control={form.control}
+                                            name='payment_amount'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input
+                                                            isRequired
+                                                            value={field.value.toString()}
+                                                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                                            type="number"
+                                                            label='Betaling'
+                                                            labelPlacement='outside'
+                                                            placeholder='0.00'
+                                                            className='text-sm font-medium leading-6'
+                                                            startContent={
+                                                                <div className="pointer-events-none flex items-center">
+                                                                    <span className="text-default-400 text-small">€</span>
+                                                                </div>
+                                                            }
+                                                            color='default'
+                                                        />
                                                     </FormControl>
                                                 </FormItem>
                                             )}
@@ -366,6 +403,9 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             label='Email 1'
                                                             labelPlacement='outside'
                                                             placeholder='gebruiker@cemi-antwerp.be'
+                                                            startContent={
+                                                                <MailIcon className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
+                                                            }
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
                                                         />
@@ -393,6 +433,9 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='gebruiker@cemi-antwerp.be'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            startContent={
+                                                                <MailIcon className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
+                                                            }
                                                         />
                                                     </FormControl>
                                                 </FormItem>
