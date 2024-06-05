@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react';
-import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Divider, Input, Switch } from '@nextui-org/react'
-import { CalendarDate, getLocalTimeZone, now, parseDate } from "@internationalized/date";
+import { Card, CardBody, CardFooter, CardHeader, Chip, Divider, Input, Switch } from '@nextui-org/react'
+import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
 import { Select, SelectItem } from "@nextui-org/react";
@@ -18,7 +18,7 @@ import { createClient } from '@/utils/supabase/client';
 import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from 'react-hot-toast';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -52,7 +52,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     const supabase = createClient();
     const router = useRouter()
-    const { toast } = useToast()
 
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
@@ -116,10 +115,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
             if (studentError) throw studentError;
 
-            toast({
-                title: "Nieuwe student aangemaakt!",
-                description: `${studentData[0].firstname} ${studentData[0].lastname} is aangemaakt.`,
-            })
+            toast.success(`${studentData[0].firstname} ${studentData[0].lastname} is aangemaakt.`)
 
             const studentId = studentData[0].studentid;
 
@@ -138,17 +134,9 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
             if (enrollmentError) throw enrollmentError;
 
-            toast({
-                title: "Inschrijving in orde!",
-                description: `De inschrijving van ${studentData[0].firstname} ${studentData[0].lastname} is compleet.`,
-            })
-
+            toast.success(`De inschrijving van ${studentData[0].firstname} ${studentData[0].lastname} is compleet.`)
         } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: "Oeps, er ging iets mis tijdens het inschrijven!",
-                description: `${error.message}`,
-            })
+            toast.error('Oeps, er ging iets mis tijdens het inschrijven!')
         } finally {
             setLoading(false)
             router.push('/')

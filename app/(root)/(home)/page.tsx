@@ -5,14 +5,13 @@ import { createClient } from "@/utils/supabase/client";
 import StudentsTable from '../../../components/StudentsTable';
 import { Divider, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 import { EnrollmentWithStudent } from "@/utils/types";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from 'react-hot-toast';
 
 export default function Index() {
   const [loading, setLoading] = useState(true)
   const [selectedKeys, setSelectedKeys] = useState(new Set(["2023"]));
   const [data, setData] = useState<Array<EnrollmentWithStudent>>([])
 
-  const { toast } = useToast()
   const supabase = createClient();
 
   useEffect(() => {
@@ -30,11 +29,7 @@ export default function Index() {
       fetchData();
 
     } catch (e: any) {
-      toast({
-        variant: "destructive",
-        title: "Oeps, er ging iets mis bij het ophalen van de inschrijvingen",
-        description: e.message,
-      })
+      toast.error('Oeps, er ging iets mis bij het ophalen van de inschrijvingen')
     }
   }, [selectedKeys])
 
