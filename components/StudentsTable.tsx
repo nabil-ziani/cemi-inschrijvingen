@@ -49,7 +49,7 @@ export default function StudentsTable({ data }: StudentsProps) {
     });
     const [page, setPage] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
-    const [modalType, setModalType] = useState<'delete' | 'update'>('')
+    const [modalType, setModalType] = useState<'delete' | 'update' | ''>('')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -112,8 +112,8 @@ export default function StudentsTable({ data }: StudentsProps) {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = useCallback((enrollment: Enrollment, columnKey: React.Key) => {
-        const cellValue = enrollment[columnKey as keyof Enrollment];
+    const renderCell = useCallback((enrollment: EnrollmentWithStudent, columnKey: React.Key) => {
+        const cellValue = enrollment[columnKey as keyof EnrollmentWithStudent];
 
         switch (columnKey) {
             case "firstname":

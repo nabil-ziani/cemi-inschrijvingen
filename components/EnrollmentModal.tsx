@@ -10,7 +10,7 @@ interface DeleteEnrollmentModalProps {
     isOpen: boolean,
     onClose: () => void,
     enrollment?: { id: string, student: { name: string } }
-    type: 'delete' | 'update'
+    type: 'delete' | 'update' | ''
 }
 
 const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollmentModalProps) => {
