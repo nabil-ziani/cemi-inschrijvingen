@@ -140,7 +140,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 );
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-2">
+                    <div className="relative flex items-center gap-3">
                         <Tooltip content="Herinschrijven">
                             <span onClick={() => {
                                 setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })

@@ -14,7 +14,7 @@ interface DeleteEnrollmentModalProps {
 }
 
 const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollmentModalProps) => {
-    const [passedIsSelected, setPassedIsSelected] = useState(false);
+    const [passedIsSelected, setPassedIsSelected] = useState(true);
 
     const supabase = createClient()
 
@@ -42,46 +42,52 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1 m-auto">
-                                {type == 'update' ?
-                                    <div className="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-12 sm:w-12">
-                                        <GraduationCap className="h-6 w-6 text-green-600" />
-                                    </div>
-                                    :
-                                    <div className="mx-auto flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-12 sm:w-12">
-                                        <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
-                                    </div>
-                                }
-                            </ModalHeader>
                             <ModalBody className="text-center">
-                                <h3 className="text-xl font-bold">{type == 'update' ? 'Leerling geslaagd?' : 'Leerling Uitschrijven'}</h3>
+                                {/* HEADER */}
+                                <div className="flex justify-center mt-2">
+                                    {type == 'update' ?
+                                        passedIsSelected ?
+                                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-12 sm:w-12">
+                                                <Check className="h-6 w-6 text-green-600" />
+                                            </div>
+                                            :
+                                            <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-12 sm:w-12">
+                                                <X className="h-6 w-6 text-red-600" />
+                                            </div>
+                                        :
+                                        <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-12 sm:w-12">
+                                            <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+                                        </div>
+                                    }
+                                </div>
+                                {/* BODY */}
+                                <h3 className="text-lg font-semibold text-gray-900">{type == 'update' ? 'Leerling geslaagd?' : 'Leerling uitschrijven'}</h3>
                                 {type == 'update' ?
-                                    <div className='flex items-center justify-center gap-5'>
-                                        <h2 className='font-medium leading-none text-default-700'>
+                                    <div className='flex items-center justify-center gap-3'>
+                                        <h2 className='text-sm leading-none text-gray-500'>
                                             Geef aan of <span className='font-bold'>{enrollment?.student.name}</span> geslaagd is:
                                         </h2>
                                         <Switch
+                                            isSelected={passedIsSelected}
                                             onValueChange={setPassedIsSelected}
-                                            size='lg'
+                                            size='sm'
                                             color={'primary'}
                                             startContent={<Check />}
                                             endContent={<X />}
                                         />
-                                        {/* <p className={`ml-3 text-small ${passedIsSelected ? 'text-green-800' : 'text-red-800'}`}>{passedIsSelected ? "geslaagd" : "niet geslaagd"}</p> */}
                                     </div>
                                     :
-                                    <p className="mt-2 font-medium text-default-700">
+                                    <p className="text-sm text-default-gray-500">
                                         Ben je zeker dat je <span className="font-semibold">{enrollment?.student.name}</span> wil uitschrijven?
                                     </p>}
                             </ModalBody>
-                            <Divider className="mt-4" />
                             <ModalFooter className="flex justify-evenly">
                                 {type == 'update' ?
                                     <>
-                                        <Button className="pr-5 pl-5" onPress={onClose} radius="full" variant="flat">
+                                        <Button className="flex-1" onPress={onClose} variant="flat">
                                             Ga terug
                                         </Button>
-                                        <Button color='primary' radius="full" onClick={updateSchoolResult}>
+                                        <Button className="flex-1" color='primary' onClick={updateSchoolResult}>
                                             <Link href={`/enrollment/${enrollment.id}`}>
                                                 Verdergaan
                                             </Link>
@@ -90,10 +96,10 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
                                     :
                                     <>
-                                        <Button className="pr-5 pl-5" onPress={onClose} radius="full" variant="flat">
+                                        <Button className="flex-1" onPress={onClose} variant="flat">
                                             Nee, dat wil ik niet.
                                         </Button>
-                                        <Button className="pr-5 pl-5" color="danger" onPress={onClose} radius="full" onClick={enrollStudentOut}>
+                                        <Button className="flex-1" color="danger" onPress={onClose} onClick={enrollStudentOut}>
                                             Ja, uitschrijven!
                                         </Button>
                                     </>
