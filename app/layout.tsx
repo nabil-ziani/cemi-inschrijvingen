@@ -4,8 +4,7 @@ import { GeistSans } from "geist/font/sans";
 // import NextTopLoader from 'nextjs-toploader'
 import "./globals.css";
 import ThemeProvider from "@/providers/ThemeProvider";
-
-// import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/toaster";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -27,8 +26,8 @@ export default function RootLayout({
       <body>
         {/* <NextTopLoader showSpinner={false} height={2} color="#e18438" /> */}
         <ThemeProvider>
+          <Toaster />
           {children}
-          {/* <Toaster /> */}
         </ThemeProvider>
       </body>
     </html>

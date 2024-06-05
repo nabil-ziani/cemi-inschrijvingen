@@ -18,6 +18,7 @@ import { createClient } from '@/utils/supabase/client';
 import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
+import { useToast } from "@/components/ui/use-toast"
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -51,6 +52,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     const supabase = createClient();
     const router = useRouter()
+    const { toast } = useToast()
 
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
@@ -114,7 +116,10 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
             if (studentError) throw studentError;
 
-            // TODO: add toast 'Nieuwe student is succesvol aangemaakt!'
+            toast({
+                title: "Nieuwe student aangemaakt!",
+                description: `${studentData[0].firstname} ${studentData[0].lastname} is aangemaakt.`,
+            })
 
             const studentId = studentData[0].studentid;
 
@@ -133,15 +138,20 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
             if (enrollmentError) throw enrollmentError;
 
-            // TODO: add toast 'Inschrijving voor ${full_name} is in orde!'
+            toast({
+                title: "Inschrijving in orde!",
+                description: `De inschrijving van ${studentData[0].firstname} ${studentData[0].lastname} is compleet.`,
+            })
 
         } catch (error: any) {
-            // TODO: add toast 'Er lijkt iets mis te zijn gegaan tijdens het inschrijven..'
-            console.error('Error updating enrollment:', error.message);
-            alert('Failed to update enrollment');
+            toast({
+                variant: 'destructive',
+                title: "Oeps, er ging iets mis tijdens het inschrijven!",
+                description: `${error.message}`,
+            })
         } finally {
             setLoading(false)
-            // router.push('/')
+            router.push('/')
         }
     };
 
