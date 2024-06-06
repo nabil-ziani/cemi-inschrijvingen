@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
@@ -49,13 +49,11 @@ const formSchema = z.object({
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
-    const [selectedKeys, setSelectedKeys] = useState(new Set(["2023"]));
     const [loading, setLoading] = useState(false)
 
     const supabase = createClient();
     const router = useRouter()
 
-    // --- TODO: fix issue, when new student is enrolled, he has no level ---
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
     let newLevel: Level | undefined;
@@ -386,7 +384,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                         />
                                     </div>
                                 </div>
-
 
                                 {/* Klastype - Email 1 - Email 2 - Alleen naar huis? */}
                                 <div className="sm:col-span-1">
