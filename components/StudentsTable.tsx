@@ -1,36 +1,16 @@
 'use client'
 
 import { useCallback, useMemo, useState } from "react";
-import {
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Input,
-    Button,
-    DropdownTrigger,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    Chip,
-    User,
-    Pagination,
-    SortDescriptor,
-    Selection,
-    Tooltip,
-    useDisclosure
-} from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, Tooltip, useDisclosure } from "@nextui-org/react";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { useRouter } from "next/navigation";
 import { UserCheck, UserX } from "lucide-react";
-import { EnrollmentWithStudent } from "@/utils/types";
+import { Enrollment, EnrollmentWithStudent } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
+import { useRouter } from "next/navigation";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
@@ -45,15 +25,14 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
     const [statusFilter, setStatusFilter] = useState<Selection>("all");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "age",
+        column: "firstname",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
-    const [modalType, setModalType] = useState<'delete' | 'update' | ''>('')
+    const [modalType, setModalType] = useState<'delete' | 'update' | 'enroll'>('enroll')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-
     const router = useRouter()
 
     // MODAL
@@ -141,15 +120,23 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
-                        <Tooltip content="Herinschrijven">
-                            <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
-                                setModalType('update')
-                                handleOpen()
-                            }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <UserCheck strokeWidth={1} />
-                            </span>
-                        </Tooltip>
+                        {enrollment.completed ?
+                            <Tooltip content="Wijzigen">
+                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                    <UserX strokeWidth={1} />
+                                </span>
+                            </Tooltip>
+                            :
+                            <Tooltip content="Herinschrijven">
+                                <span onClick={() => {
+                                    setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                    setModalType('enroll')
+                                    handleOpen()
+                                }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                    <UserCheck strokeWidth={1} />
+                                </span>
+                            </Tooltip>
+                        }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
                                 setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })

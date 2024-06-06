@@ -52,7 +52,6 @@ export default function Index() {
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label="Single selection example"
             variant="flat"
             disallowEmptySelection
             selectionMode="single"

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Divider, Input, Switch } from '@nextui-org/react'
+import { useMemo, useState } from 'react';
+import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -9,7 +9,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
-import { EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
+import { ClassTypeEnum, EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -42,17 +42,20 @@ const formSchema = z.object({
     city: z.string(),
     remarks: z.union([z.literal(''), z.string()]),
     payment_amount: z.number(),
-    level: z.string()
+    level: z.string(),
+    classtype: z.string()
 });
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
+    const [selectedKeys, setSelectedKeys] = useState(new Set(["2023"]));
     const [loading, setLoading] = useState(false)
 
     const supabase = createClient();
     const router = useRouter()
 
+    // --- TODO: fix issue, when new student is enrolled, he has no level ---
     const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
 
     let newLevel: Level | undefined;
@@ -80,12 +83,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             city: enrollment && enrollment?.student?.city || '',
             remarks: enrollment && enrollment?.student?.remarks || '',
             payment_amount: enrollment && enrollment?.payment_amount || 0,
-            level: enrollment && newLevel?.levelid ? newLevel.levelid : ''
+            level: enrollment && newLevel?.levelid || '',
+            classtype: enrollment && enrollment?.class?.class_type || ''
         }
     });
 
     // --- Make new enrollment for year 2024 ---
-    // Payment_amount will increase €20 
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             // If enrollment is null, new student will be created otherwise linked student will be updated
@@ -115,8 +118,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
             if (studentError) throw studentError;
 
-            toast.success(`${studentData[0].firstname} ${studentData[0].lastname} is aangemaakt.`)
-
             const studentId = studentData[0].studentid;
 
             const { data: enrollmentData, error: enrollmentError } = await supabase
@@ -128,15 +129,18 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     year: 2024,
                     passed: null,
                     payment_amount: data.payment_amount,
-                    status: EnrollmentStatusEnum.Enum.Heringeschreven
+                    status: EnrollmentStatusEnum.Enum.Heringeschreven,
+                    levelid: data.level,
+                    payment_complete: data.classtype == ClassTypeEnum.Enum.Weekend ? data.payment_amount == 240 : data.payment_amount == 130,
+                    completed: true
                 }, { onConflict: 'enrollmentid' })
                 .select();
 
             if (enrollmentError) throw enrollmentError;
 
-            toast.success(`De inschrijving van ${studentData[0].firstname} ${studentData[0].lastname} is compleet.`)
+            toast.success(`${studentData[0].firstname} is ingeschreven!`)
         } catch (error: any) {
-            toast.error('Oeps, er ging iets mis tijdens het inschrijven!')
+            toast.error('Oeps, er ging iets mis bij het inschrijven!')
         } finally {
             setLoading(false)
             router.push('/')
@@ -384,7 +388,38 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                 </div>
 
 
-                                {/* Email 1 - Email 2 - Alleen naar huis? */}
+                                {/* Klastype - Email 1 - Email 2 - Alleen naar huis? */}
+                                <div className="sm:col-span-1">
+                                    <div>
+                                        <FormField
+                                            control={form.control}
+                                            name='classtype'
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Select
+                                                            isRequired
+                                                            defaultSelectedKeys={enrollment?.class?.class_type ? [enrollment.class.class_type] : []}
+                                                            {...field}
+                                                            label='Type klas'
+                                                            labelPlacement='outside'
+                                                            placeholder='Selecteer het klastype'
+                                                            color='default'
+                                                            className='text-sm font-medium leading-6'
+                                                        >
+                                                            {ClassTypeEnum.options.map((classType) => (
+                                                                <SelectItem key={classType} description={classType == ClassTypeEnum.Enum.Weekend ? '€240' : '€130'}>
+                                                                    {classType}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </Select>
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
                                 <div className="sm:col-span-2">
                                     <div>
                                         <FormField
@@ -442,7 +477,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                     </div>
                                 </div>
 
-                                <div className="sm:col-span-2 xl:col-span-1 flex flex-col items-center justify-center">
+                                <div className="sm:col-span-1 xl:col-span-1 flex flex-col items-center justify-center">
                                     <div className="mt-4">
                                         <FormField
                                             control={form.control}
@@ -543,6 +578,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                         />
                                     </div>
                                 </div>
+
                                 <div className="sm:col-span-2">
                                     <div>
                                         <FormField
@@ -569,6 +605,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                     </div>
                                 </div>
 
+                                {/* Opermkingen */}
                                 <div className="col-span-full">
                                     <div>
                                         <FormField
@@ -595,7 +632,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                             </div>
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
-                            <SubmitButton text={loading ? 'Laden...' : 'Herinschrijven'} loading={loading} />
+                            {
+                                enrollment?.completed ?
+                                    <Button variant='solid' isDisabled>Reeds ingeschreven</Button>
+                                    :
+                                    <SubmitButton text={loading ? 'Laden...' : 'Herinschrijven'} loading={loading} />
+                            }
                         </CardFooter>
                     </Card>
                 </form>

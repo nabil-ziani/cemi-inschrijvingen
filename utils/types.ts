@@ -11,7 +11,9 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 export interface Enrollment {
     classid: string | null
+    completed: boolean
     enrollmentid: string
+    levelid: string | null
     passed: boolean | null
     payment_amount: number
     payment_complete: boolean

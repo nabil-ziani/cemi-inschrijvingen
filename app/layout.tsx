@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-// import NextTopLoader from 'nextjs-toploader'
 import "./globals.css";
 import ThemeProvider from "@/providers/ThemeProvider";
 import { Toaster } from "react-hot-toast";
@@ -24,7 +23,6 @@ export default function RootLayout({
   return (
     <html lang="nl" className={`${GeistSans.className}`} suppressHydrationWarning>
       <body>
-        {/* <NextTopLoader showSpinner={false} height={2} color="#e18438" /> */}
         <ThemeProvider>
           <Toaster position="top-right" />
           {children}

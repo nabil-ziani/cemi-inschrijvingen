@@ -50,7 +50,9 @@ export type Database = {
       enrollment: {
         Row: {
           classid: string | null
+          completed: boolean
           enrollmentid: string
+          levelid: string | null
           passed: boolean | null
           payment_amount: number
           payment_complete: boolean
@@ -60,7 +62,9 @@ export type Database = {
         }
         Insert: {
           classid?: string | null
+          completed?: boolean
           enrollmentid?: string
+          levelid?: string | null
           passed?: boolean | null
           payment_amount?: number
           payment_complete?: boolean
@@ -70,7 +74,9 @@ export type Database = {
         }
         Update: {
           classid?: string | null
+          completed?: boolean
           enrollmentid?: string
+          levelid?: string | null
           passed?: boolean | null
           payment_amount?: number
           payment_complete?: boolean
@@ -85,6 +91,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "class"
             referencedColumns: ["classid"]
+          },
+          {
+            foreignKeyName: "enrollment_levelid_fkey"
+            columns: ["levelid"]
+            isOneToOne: false
+            referencedRelation: "level"
+            referencedColumns: ["levelid"]
           },
           {
             foreignKeyName: "enrollment_studentid_fkey"
