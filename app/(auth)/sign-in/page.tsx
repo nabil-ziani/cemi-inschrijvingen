@@ -4,7 +4,7 @@ export const metadata = {
   title: 'Login'
 }
 
-export default function SignInPage({ searchParams }: { searchParams: { msg: string } }) {
+export default function SignInPage() {
   return (
     <SignIn />
   );

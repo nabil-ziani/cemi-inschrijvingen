@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from "next/link";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
-import { signIn } from '@/app/(auth)/actions';
 import toast from 'react-hot-toast';
 import { EyeFilledIcon } from '../icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
@@ -13,28 +12,25 @@ import { MailIcon } from '../icons/MailIcon';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { ZodType, z } from 'zod';
+import { z } from 'zod';
 import { createClient } from '@/utils/supabase/client';
-
-export interface SignInFormData {
-    email: string;
-    password: string;
-}
 
 export function SignIn() {
     const [loading, setLoading] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [value, setValue] = useState("");
 
-    const UserSchema: ZodType<SignInFormData> = z.object({
+    const SignInSchema = z.object({
         email: z.string().min(1, { message: 'Dit veld is verplicht' }).email({ message: 'Email is niet geldig' }),
         password: z.string().min(8, { message: "Wachtwoord te kort, minstens 8 karakters" }),
     })
 
+    type SignInFormData = z.infer<typeof SignInSchema>;
+
     const supabase = createClient()
     const router = useRouter()
     const { register, handleSubmit, formState: { errors }, reset } = useForm<SignInFormData>({
-        resolver: zodResolver(UserSchema),
+        resolver: zodResolver(SignInSchema),
         mode: "onBlur",
     });
 
@@ -111,7 +107,7 @@ export function SignIn() {
                             errorMessage={errors.password?.message}
                             className="max-w-xs"
                         />
-                        <p className="text-sm text-gray-500 mt-2 underline hover:cursor-pointer" onClick={() => router.push('')}>
+                        <p className="text-sm text-gray-500 mt-2 underline hover:cursor-pointer" onClick={() => router.push('/password/reset')}>
                             Wachtwoord vergeten?
                         </p>
                     </div>
