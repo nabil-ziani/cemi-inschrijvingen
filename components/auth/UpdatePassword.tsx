@@ -12,7 +12,6 @@ import { EyeFilledIcon } from "../icons/EyeFilledIcon";
 import { z } from "zod";
 import toast from "react-hot-toast";
 
-
 const UpdatePassword = () => {
     const [loading, setLoading] = useState<boolean>(false)
     const [passwordShown, setPasswordShown] = useState(false);
