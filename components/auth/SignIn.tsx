@@ -1,25 +1,60 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from "next/link";
-import { SignInForm } from "@/components/auth/SignInForm";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
 import { signIn } from '@/app/(auth)/actions';
-import { NOTIFICATION_TYPE, Notification } from '@/components/Notification';
+import toast from 'react-hot-toast';
+import { EyeFilledIcon } from '../icons/EyeFilledIcon';
+import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
+import { Input } from '@nextui-org/react';
+import { MailIcon } from '../icons/MailIcon';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { ZodType, z } from 'zod';
+import { createClient } from '@/utils/supabase/client';
 
 export interface SignInFormData {
     email: string;
     password: string;
 }
 
-export function SignIn({ error }: { error: string }) {
+export function SignIn() {
     const [loading, setLoading] = useState(false)
-    const [errorMsg, setErrorMsg] = useState('')
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [value, setValue] = useState("");
 
-    useEffect(() => {
-        if (error) setErrorMsg(error)
-    }, [error])
+    const UserSchema: ZodType<SignInFormData> = z.object({
+        email: z.string().min(1, { message: 'Dit veld is verplicht' }).email({ message: 'Email is niet geldig' }),
+        password: z.string().min(8, { message: "Wachtwoord te kort, minstens 8 karakters" }),
+    })
+
+    const supabase = createClient()
+    const router = useRouter()
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<SignInFormData>({
+        resolver: zodResolver(UserSchema),
+        mode: "onBlur",
+    });
+
+    const toggleVisibility = () => setPasswordVisible(!passwordVisible);
+
+    const handleFormSubmit = async (formData: SignInFormData) => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+
+            if (error)
+                toast.error('Verkeerd email of wachtwoord ingegeven');
+
+            reset();
+        } catch (e) {
+            toast.error('Oeps, Er ging iets mis tijdens het inloggen');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="flex flex-1 flex-col h-screen w-screen items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
@@ -39,12 +74,47 @@ export function SignIn({ error }: { error: string }) {
                         Gebruik je email en wachtwoord om in te loggen
                     </p>
                 </div>
-                {errorMsg && <Notification type={NOTIFICATION_TYPE.error} message='Verkeerd email of wachtwoord ingegeven' />}
-                <SignInForm action={async (formData: SignInFormData) => {
-                    setLoading(true)
-                    await signIn(formData)
-                    setLoading(false)
-                }}>
+                <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16">
+                    <div>
+                        <Input
+                            id="email"
+                            value={value}
+                            type="email"
+                            label="Email"
+                            variant="bordered"
+                            onValueChange={setValue}
+                            className="max-w-xs"
+                            {...register('email')}
+                            isInvalid={errors.email !== undefined}
+                            errorMessage={errors.email?.message}
+                            endContent={
+                                <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                            }
+                        />
+                    </div>
+                    <div>
+                        <Input
+                            label="Wachtwoord"
+                            variant="bordered"
+                            {...register('password')}
+                            endContent={
+                                <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
+                                    {passwordVisible ? (
+                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    ) : (
+                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                    )}
+                                </button>
+                            }
+                            type={passwordVisible ? "text" : "password"}
+                            isInvalid={errors.password !== undefined}
+                            errorMessage={errors.password?.message}
+                            className="max-w-xs"
+                        />
+                        <p className="text-sm text-gray-500 mt-2 underline hover:cursor-pointer" onClick={() => router.push('')}>
+                            Wachtwoord vergeten?
+                        </p>
+                    </div>
                     <SubmitButton text={loading ? 'Laden...' : 'Login'} loading={loading} />
                     <p className="text-center text-sm text-gray-500">
                         {"Nog geen account? "}
@@ -52,7 +122,7 @@ export function SignIn({ error }: { error: string }) {
                             Registreer je hier.
                         </Link>
                     </p>
-                </SignInForm>
+                </form>
             </div>
         </div >
     )
