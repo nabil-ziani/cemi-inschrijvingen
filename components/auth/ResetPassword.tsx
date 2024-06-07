@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
-import { NOTIFICATION_TYPE, Notification } from '@/components/Notification';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
 import { Input } from "@nextui-org/react";
 import { MailIcon } from "../icons/MailIcon";
+import toast from "react-hot-toast";
 
 type FormValues = {
     email: string
@@ -15,8 +15,6 @@ type FormValues = {
 
 const ResetPassword = () => {
     const [loading, setLoading] = useState<boolean>(false)
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [value, setValue] = useState("");
 
     const { register, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm<FormValues>({ mode: 'onChange' })
@@ -31,12 +29,13 @@ const ResetPassword = () => {
             });
 
             if (error) {
-                setErrorMsg(error.message)
+                console.log(error)
+                toast.error('Oeps, probeer het later opnieuw.')
             } else {
-                setSuccessMsg('Er is een mail verzonden met verdere instructies!');
+                toast.success('Indien er een account gelinkt is ontvang je een mail met verdere instructies!')
             }
-        } catch (error: any) {
-            setErrorMsg(error.message)
+        } catch (error) {
+            toast.error('Oeps, probeer het later opnieuw.')
         } finally {
             setLoading(false)
         }
@@ -57,10 +56,9 @@ const ResetPassword = () => {
                 <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 bg-white px-4 py-6 pt-8 text-center sm:px-16">
                     <h3 className="text-xl font-semibold">Reset wachtwoord</h3>
                     <p className="text-sm text-gray-500">
-                        Geef het e-mailadres in waarvoor je de wachtwoord wil resetten
+                        Geef je e-mailadres in.
                     </p>
                 </div>
-                {errorMsg && <Notification type={NOTIFICATION_TYPE.error} message='Verkeerd email of wachtwoord ingegeven' />}
                 <form onSubmit={handleSubmit(resetPassword)} className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16">
                     <div>
                         <Input

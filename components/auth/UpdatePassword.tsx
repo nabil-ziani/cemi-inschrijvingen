@@ -3,34 +3,30 @@
 import { useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
-import { NOTIFICATION_TYPE, Notification } from '@/components/Notification';
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
 import { Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { EyeSlashFilledIcon } from "../icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../icons/EyeFilledIcon";
-import { z, ZodType } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import toast from "react-hot-toast";
 
-interface UpdatePasswordFormData {
-    password: string;
-    confirmPassword: string
-}
 
 const UpdatePassword = () => {
     const [loading, setLoading] = useState<boolean>(false)
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [passwordShown, setPasswordShown] = useState(false);
     const [passwordConfirmShown, setPasswordConfirmShown] = useState(false);
 
-    const UpdatePasswordSchema: ZodType<UpdatePasswordFormData> = z.object({
+    const UpdatePasswordSchema = z.object({
         password: z.string().min(8, { message: "Wachtwoord te kort, minstens 8 karakters" }),
         confirmPassword: z.string(),
     }).refine((data) => data.password === data.confirmPassword, {
         message: "Wachtwoord komt niet overeen",
         path: ["confirmPassword"],
     });
+
+    type UpdatePasswordFormData = z.infer<typeof UpdatePasswordSchema>;
 
     const { register, handleSubmit, watch, formState: { errors, isValid, isSubmitting } } = useForm<UpdatePasswordFormData>({ mode: 'onBlur' })
     const router = useRouter();
@@ -43,12 +39,14 @@ const UpdatePassword = () => {
                 password: formData.password,
             });
 
-            if (error) setErrorMsg(error.message);
+            if (error) {
+                toast.error('Oeps, probeer het later opnieuw.')
+            }
 
             // user will be authenticated and can go to home page
             router.replace('/');
         } catch (error: any) {
-            setErrorMsg(error.message)
+            toast.error('Oeps, probeer het later opnieuw.')
         } finally {
             setLoading(false)
         }
@@ -80,7 +78,6 @@ const UpdatePassword = () => {
                         Bevestig je nieuwe wachtwoord
                     </p>
                 </div>
-                {errorMsg && <Notification type={NOTIFICATION_TYPE.error} message='Verkeerd email of wachtwoord ingegeven' />}
                 <form onSubmit={handleSubmit(updatePassword)} className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16">
                     <div>
                         <Input
