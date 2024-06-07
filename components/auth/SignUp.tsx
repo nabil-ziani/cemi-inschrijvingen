@@ -29,12 +29,6 @@ export function SignUp({ error }: { error: string }) {
             </div>
             <div className="mt-10 z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
                 <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 bg-white px-4 py-6 pt-8 text-center sm:px-16">
-                    {/* {errorMsg && (
-                        <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-                            Er ging iets mis bij het registreren, probeer het opnieuw
-                        </p>
-                    )} */}
-
                     <h3 className="text-xl font-semibold">Registratie</h3>
                     <p className="text-sm text-gray-500">
                         Maak een nieuw account aan

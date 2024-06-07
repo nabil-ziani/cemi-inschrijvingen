@@ -9,6 +9,7 @@ import { z, ZodType } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInFormData } from "./SignIn";
+import { useRouter } from "next/navigation";
 
 interface FormProps {
     action: SubmitHandler<SignInFormData>
@@ -24,6 +25,7 @@ export function SignInForm({ action, children }: FormProps) {
         password: z.string().min(8, { message: "Wachtwoord te kort, minstens 8 karakters" }),
     })
 
+    const router = useRouter()
     const { register, handleSubmit, formState: { errors } } = useForm<SignInFormData>({
         resolver: zodResolver(UserSchema),
         mode: "onSubmit",
@@ -69,6 +71,9 @@ export function SignInForm({ action, children }: FormProps) {
                     errorMessage={errors.password?.message}
                     className="max-w-xs"
                 />
+                <p className="text-sm text-gray-500 mt-2 underline hover:cursor-pointer" onClick={() => router.push('')}>
+                    Wachtwoord vergeten?
+                </p>
             </div>
             {children}
         </form>
