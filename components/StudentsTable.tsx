@@ -1,69 +1,39 @@
 'use client'
 
-import { createClient } from "@/utils/supabase/client";
-import { Enrollment, getEnrollmentsByYear } from '@/queries/get_enrollments_by_year'
-import { useQuery } from '@supabase-cache-helpers/postgrest-react-query'
 import { useCallback, useMemo, useState } from "react";
-import {
-    Table,
-    TableHeader,
-    TableColumn,
-    TableBody,
-    TableRow,
-    TableCell,
-    Input,
-    Button,
-    DropdownTrigger,
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    Chip,
-    User,
-    Pagination,
-    SortDescriptor,
-    Selection,
-    Tooltip,
-    useDisclosure
-} from "@nextui-org/react";
-import { PlusIcon } from "@/components/icons/PlusIcon";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, Tooltip, useDisclosure } from "@nextui-org/react";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
-import { EyeIcon } from "@/components/icons/ViewIcon"
-import { EditIcon } from "@/components/icons/EditIcon";
-import { DeleteIcon } from "@/components/icons/DeleteIcon";
 import { formatCurrency } from "@/utils/numberUtils";
-import DeleteEnrollmentModal from "@/components/DeleteEnrollmentModal";
+import { UserCheck, UserX } from "lucide-react";
+import { Enrollment, EnrollmentWithStudent } from "@/utils/types";
+import EnrollmentModal from "./EnrollmentModal";
 import { useRouter } from "next/navigation";
-import { UserCheck, UserPlusIcon, UserRoundCheck, UserRoundMinus, UserRoundPlus, UserRoundX, UserX } from "lucide-react";
-
-// const statusColorMap: Record<string, ChipProps["color"]> = {
-//     active: "success",
-//     paused: "danger",
-//     vacation: "warning",
-// };
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
 
-export default function Students() {
+interface StudentsProps {
+    data: EnrollmentWithStudent[],
+    loading: boolean
+}
+
+export default function StudentsTable({ data, loading }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
     const [statusFilter, setStatusFilter] = useState<Selection>("all");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
-        column: "age",
+        column: "firstname",
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
-    const supabase = createClient()
+    const [modalType, setModalType] = useState<'delete' | 'update' | 'enroll'>('enroll')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const { data, error } = useQuery(getEnrollmentsByYear(supabase, '2023'))
     const router = useRouter()
-
-    if (error) return
 
     // MODAL
     const handleOpen = () => {
@@ -114,16 +84,16 @@ export default function Students() {
 
     const sortedItems = useMemo(() => {
         return [...items].sort((a: Enrollment, b: Enrollment) => {
-            const first = a[sortDescriptor.column as keyof Enrollment] as number;
-            const second = b[sortDescriptor.column as keyof Enrollment] as number;
+            const first = a[sortDescriptor.column as keyof Enrollment];
+            const second = b[sortDescriptor.column as keyof Enrollment];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
 
             return sortDescriptor.direction === "descending" ? -cmp : cmp;
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = useCallback((enrollment: Enrollment, columnKey: React.Key) => {
-        const cellValue = enrollment[columnKey as keyof Enrollment];
+    const renderCell = useCallback((enrollment: EnrollmentWithStudent, columnKey: React.Key) => {
+        const cellValue = enrollment[columnKey as keyof EnrollmentWithStudent];
 
         switch (columnKey) {
             case "firstname":
@@ -149,17 +119,28 @@ export default function Students() {
                 );
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-2">
-                        <Tooltip content="Herinschrijven">
-                            <span onClick={() => {
-                                router.push(`/enrollment/${enrollment.enrollmentid}`)
-                            }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                <UserCheck strokeWidth={1} />
-                            </span>
-                        </Tooltip>
+                    <div className="relative flex items-center gap-3">
+                        {enrollment.completed ?
+                            <Tooltip content="Wijzigen">
+                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-danger cursor-pointer active:opacity-50">
+                                    <UserX strokeWidth={1} />
+                                </span>
+                            </Tooltip>
+                            :
+                            <Tooltip content="Herinschrijven">
+                                <span onClick={() => {
+                                    setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                    setModalType('enroll')
+                                    handleOpen()
+                                }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                    <UserCheck strokeWidth={1} />
+                                </span>
+                            </Tooltip>
+                        }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}` } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">
                                 <UserX strokeWidth={1} />
@@ -335,7 +316,32 @@ export default function Students() {
                         </TableColumn>
                     )}
                 </TableHeader>
-                <TableBody className="h-full" emptyContent={"No users found"} items={sortedItems}>
+                <TableBody className="h-full" emptyContent={
+                    loading ?
+                        <div className="flex w-full h-full justify-center items-center">
+                            <svg
+                                className="animate-spin h-5 w-5 text-current"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                />
+                                <path
+                                    className="opacity-75"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    fill="currentColor"
+                                />
+                            </svg>
+                        </div>
+                        : 'Geen inschrijvingen gevonden'
+                } items={sortedItems}>
                     {(item) => (
                         // Go to detail page onClick
                         <TableRow key={item.studentid} >
@@ -344,7 +350,7 @@ export default function Students() {
                     )}
                 </TableBody>
             </Table >
-            <DeleteEnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} />
+            <EnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} type={modalType} />
         </>
     )
 }

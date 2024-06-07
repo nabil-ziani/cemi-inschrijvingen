@@ -50,7 +50,9 @@ export type Database = {
       enrollment: {
         Row: {
           classid: string | null
+          completed: boolean
           enrollmentid: string
+          levelid: string | null
           passed: boolean | null
           payment_amount: number
           payment_complete: boolean
@@ -60,7 +62,9 @@ export type Database = {
         }
         Insert: {
           classid?: string | null
+          completed?: boolean
           enrollmentid?: string
+          levelid?: string | null
           passed?: boolean | null
           payment_amount?: number
           payment_complete?: boolean
@@ -70,7 +74,9 @@ export type Database = {
         }
         Update: {
           classid?: string | null
+          completed?: boolean
           enrollmentid?: string
+          levelid?: string | null
           passed?: boolean | null
           payment_amount?: number
           payment_complete?: boolean
@@ -85,6 +91,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "class"
             referencedColumns: ["classid"]
+          },
+          {
+            foreignKeyName: "enrollment_levelid_fkey"
+            columns: ["levelid"]
+            isOneToOne: false
+            referencedRelation: "level"
+            referencedColumns: ["levelid"]
           },
           {
             foreignKeyName: "enrollment_studentid_fkey"
@@ -124,24 +137,24 @@ export type Database = {
           phone_1: string
           phone_2: string | null
           postalcode: string | null
-          remarks: string | null
+          remarks: string
           street: string | null
           studentid: string
         }
         Insert: {
           birthdate?: string | null
           city?: string | null
-          email_1: string
+          email_1?: string
           email_2?: string | null
-          firstname: string
+          firstname?: string
           gender: Database["public"]["Enums"]["gender"]
           homeAlone?: boolean
           housenumber?: string | null
-          lastname: string
-          phone_1: string
+          lastname?: string
+          phone_1?: string
           phone_2?: string | null
           postalcode?: string | null
-          remarks?: string | null
+          remarks?: string
           street?: string | null
           studentid?: string
         }
@@ -158,7 +171,7 @@ export type Database = {
           phone_1?: string
           phone_2?: string | null
           postalcode?: string | null
-          remarks?: string | null
+          remarks?: string
           street?: string | null
           studentid?: string
         }

@@ -1,8 +1,11 @@
 import { SignUp } from "@/components/auth/SignUp";
 
-export default function SignUpPage({ searchParams }: { searchParams: { msg: string } }) {
+export const metadata = {
+    title: 'Registreer'
+}
 
+export default function SignUpPage() {
     return (
-        <SignUp error={searchParams.msg} />
+        <SignUp />
     );
 }

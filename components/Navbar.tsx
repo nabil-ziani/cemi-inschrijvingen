@@ -4,7 +4,7 @@ import React from 'react'
 import MobileNav from './MobileNav'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
-import AuthButton from './AuthButton'
+import AuthButton from './auth/AuthButton'
 
 export default async function Navbar() {
     const supabase = createClient();

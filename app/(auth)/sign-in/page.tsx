@@ -1,7 +1,11 @@
 import { SignIn } from "@/components/auth/SignIn";
 
-export default function SignInPage({ searchParams }: { searchParams: { msg: string } }) {
+export const metadata = {
+  title: 'Login'
+}
+
+export default function SignInPage() {
   return (
-    <SignIn error={searchParams.msg} />
+    <SignIn />
   );
 }
