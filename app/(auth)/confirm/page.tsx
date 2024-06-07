@@ -1,7 +1,7 @@
-import { SignIn } from "@/components/auth/SignIn";
-
-export default function SignInPage({ searchParams }: { searchParams: { msg: string } }) {
+export default function ConfirmationPage() {
     return (
-        <SignIn error={searchParams.msg} />
+        <div>
+            <h1>An email has been sent to confirm your account!</h1>
+        </div>
     );
 }

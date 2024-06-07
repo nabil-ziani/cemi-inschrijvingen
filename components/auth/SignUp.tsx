@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from "next/link";
 import Image from "next/image";
 import { SubmitButton } from "@/components/SubmitButton";
-import { ZodType, z } from 'zod';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
@@ -14,6 +14,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from '../icons/MailIcon';
 import toast from 'react-hot-toast';
+import { revalidatePath } from 'next/cache';
 
 export function SignUp() {
     const [loading, setLoading] = useState(false)
@@ -52,12 +53,20 @@ export function SignUp() {
 
             const { error } = await supabase.auth.signUp(data)
 
-            if (error)
-                toast.error('Verkeerd email of wachtwoord ingegeven');
-
-            reset();
+            if (error) {
+                if (error.message == 'User already registered') {
+                    toast.error('Er bestaat al een account voor het opgegeven mailadres');
+                    router.push('/sign-in');
+                } else {
+                    toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
+                }
+                reset()
+            } else {
+                toast.success('Je account is aangemaakt!')
+                router.push('/sign-in');
+            }
         } catch (e) {
-            toast.error('Oeps, Er ging iets mis tijdens het inloggen');
+            toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
         } finally {
             setLoading(false);
         }

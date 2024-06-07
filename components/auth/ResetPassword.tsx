@@ -23,7 +23,7 @@ const ResetPassword = () => {
     const resetPassword: SubmitHandler<FormValues> = async (formData) => {
         try {
             setLoading(true)
-            // TODO: verify that email exists in our DB firstly
+            // --- We can not verify if email exists based on response, so generic success message is displayed ---
             const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
                 redirectTo: `${window.location.href}update`,
             });

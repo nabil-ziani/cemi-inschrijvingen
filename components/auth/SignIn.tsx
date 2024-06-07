@@ -9,11 +9,12 @@ import { EyeFilledIcon } from '../icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
 import { Input } from '@nextui-org/react';
 import { MailIcon } from '../icons/MailIcon';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { createClient } from '@/utils/supabase/client';
+import { revalidatePath } from 'next/cache';
 
 export function SignIn() {
     const [loading, setLoading] = useState(false)
@@ -41,10 +42,12 @@ export function SignIn() {
         try {
             const { error } = await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
 
-            if (error)
+            if (error) {
                 toast.error('Verkeerd email of wachtwoord ingegeven');
-
-            reset();
+                reset();
+            } else {
+                router.push('/')
+            }
         } catch (e) {
             toast.error('Oeps, Er ging iets mis tijdens het inloggen');
         } finally {
