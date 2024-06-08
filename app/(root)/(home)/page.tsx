@@ -6,18 +6,26 @@ import StudentsTable from '../../../components/StudentsTable';
 import { Divider, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 import { EnrollmentWithStudent } from "@/utils/types";
 import { toast } from 'react-hot-toast';
+import { useRouter } from "next/navigation";
 
 export default function Index() {
   const [loading, setLoading] = useState(true)
   const [selectedKeys, setSelectedKeys] = useState(new Set(["2023"]));
   const [data, setData] = useState<Array<EnrollmentWithStudent>>([])
 
+  const router = useRouter()
   const supabase = createClient();
 
   useEffect(() => {
     try {
       const fetchData = async () => {
         const getEnrollments = async (year: string) => {
+          // --- Page Protection ---
+          const { data: { session } } = await supabase.auth.getSession()
+          if (!session) {
+            router.push('/sign-in')
+          }
+
           const { data } = await supabase.from('enrollment').select(`*, student(*)`).eq('year', year).eq('status', 'Heringeschreven');
           return data;
         }

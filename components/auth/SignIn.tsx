@@ -1,22 +1,26 @@
 'use client'
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from "next/link";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
 import toast from 'react-hot-toast';
 import { EyeFilledIcon } from '../icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
-import { Input } from '@nextui-org/react';
+import { Button, Divider, Input } from '@nextui-org/react';
 import { MailIcon } from '../icons/MailIcon';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { signIn } from '@/app/(auth)/actions';
 import { createClient } from '@/utils/supabase/client';
-import { revalidatePath } from 'next/cache';
 
-export function SignIn() {
+interface SignInProps {
+    error: string
+}
+
+export function SignIn({ error }: SignInProps) {
     const [loading, setLoading] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [value, setValue] = useState("");
@@ -37,16 +41,19 @@ export function SignIn() {
 
     const toggleVisibility = () => setPasswordVisible(!passwordVisible);
 
+    useEffect(() => {
+        if (error) {
+            toast.error('Verkeerd email of wachtwoord ingegeven');
+        }
+    }, [error])
+
     const handleFormSubmit = async (formData: SignInFormData) => {
         setLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithPassword({ email: formData.email, password: formData.password });
+            await signIn(formData)
 
             if (error) {
                 toast.error('Verkeerd email of wachtwoord ingegeven');
-                reset();
-            } else {
-                router.push('/')
             }
         } catch (e) {
             toast.error('Oeps, Er ging iets mis tijdens het inloggen');
@@ -54,6 +61,22 @@ export function SignIn() {
             setLoading(false);
         }
     };
+
+    const handleGoogleLogin = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                    redirectTo: `http://localhost:3000/auth/callback`
+                }
+            })
+        } catch (e) {
+            toast.error('Oeps, Er ging iets mis tijdens het inloggen');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="flex flex-1 flex-col h-screen w-screen items-center justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
@@ -115,6 +138,8 @@ export function SignIn() {
                         </p>
                     </div>
                     <SubmitButton text={loading ? 'Laden...' : 'Login'} loading={loading} />
+                    <Divider />
+                    <Button onClick={handleGoogleLogin}>Login met Google</Button>
                     <p className="text-center text-sm text-gray-500">
                         {"Nog geen account? "}
                         <Link href="/sign-up" className="font-semibold text-[#e18438]">
