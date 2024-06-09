@@ -54,7 +54,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const supabase = createClient();
     const router = useRouter()
 
-    const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
+    // Every enrollment should have a levelid, for the moment this is not the case for 2022 enrollments (to fix!)
+    const currentLevel = getLevelById(levels!, enrollment?.levelid!)
 
     let newLevel: Level | undefined;
     if (enrollment?.passed) {
@@ -152,7 +153,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-default-700'>
                             <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
+                            &nbsp; {enrollment?.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                         </h2>
                     </div>
                 </CardHeader>
