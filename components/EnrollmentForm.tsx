@@ -10,7 +10,6 @@ import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
 import { ClassTypeEnum, EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
-import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
@@ -19,6 +18,8 @@ import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
+import { parsePhoneNumber } from 'libphonenumber-js'
+import { z } from "zod"
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -27,23 +28,54 @@ interface EnrollmentFormProps {
 
 // *** ZOD VALIDATION ***
 const formSchema = z.object({
-    firstname: z.string(),
-    lastname: z.string(),
+    firstname: z.string().min(1, { message: 'Verplicht veld' }),
+    lastname: z.string().min(1, { message: 'Verplicht veld' }),
     gender: z.boolean(),
     birthdate: z.instanceof(CalendarDate),
-    phone_1: z.string(),
-    phone_2: z.union([z.literal(''), z.string()]),
-    email_1: z.string().email(),
-    email_2: z.union([z.literal(''), z.string().email()]),
+    phone_1: z.string().min(1, { message: 'Verplicht veld' }).transform((value, ctx) => {
+        const phoneNumber = parsePhoneNumber(value, {
+            defaultCountry: 'BE'
+        })
+
+        if (!phoneNumber?.isValid()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Telefoonnummer is niet geldig",
+            });
+            return z.NEVER;
+        }
+
+        return phoneNumber.formatInternational();
+    }),
+    phone_2: z.union([z.literal(''), z.string().transform((value, ctx) => {
+        // This field is optional
+        if (!value) return
+
+        const phoneNumber = parsePhoneNumber(value, {
+            defaultCountry: 'BE'
+        })
+
+        if (!phoneNumber?.isValid()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Telefoonnummer is niet geldig",
+            });
+            return z.NEVER;
+        }
+
+        return phoneNumber.formatInternational();
+    })]),
+    email_1: z.string().min(1, { message: 'Verplicht veld' }).email({ message: 'Email is niet geldig' }),
+    email_2: z.union([z.literal(''), z.string().email({ message: 'Email is niet geldig' })]),
     homeAlone: z.boolean(),
-    street: z.string(),
-    housenumber: z.string(),
-    postalcode: z.string(),
-    city: z.string(),
+    street: z.string().min(1, { message: 'Verplicht veld' }),
+    housenumber: z.string().min(1, { message: 'Verplicht veld' }),
+    postalcode: z.string().min(1, { message: 'Verplicht veld' }),
+    city: z.string().min(1, { message: 'Verplicht veld' }),
     remarks: z.union([z.literal(''), z.string()]),
-    payment_amount: z.number(),
-    level: z.string(),
-    classtype: z.string()
+    payment_amount: z.number().min(1, { message: 'Verplicht veld' }),
+    level: z.string().min(1, { message: 'Verplicht veld' }),
+    classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
 
 const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
@@ -54,7 +86,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const supabase = createClient();
     const router = useRouter()
 
-    const currentLevel = getLevelById(levels!, enrollment?.class?.levelid!)
+    // Every enrollment should have a levelid, for the moment this is not the case for 2022 enrollments (to fix!)
+    const currentLevel = getLevelById(levels!, enrollment?.levelid!)
 
     let newLevel: Level | undefined;
     if (enrollment?.passed) {
@@ -65,6 +98,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
+        mode: 'onBlur',
         defaultValues: {
             firstname: enrollment && capitalize(enrollment?.student?.firstname!) || '',
             lastname: enrollment && capitalize(enrollment?.student?.lastname!) || '',
@@ -152,7 +186,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-default-700'>
                             <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                            &nbsp; {enrollment?.student?.gender ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
+                            &nbsp; {enrollment?.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                         </h2>
                     </div>
                 </CardHeader>
@@ -210,6 +244,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Voornaam'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.firstname !== undefined}
+                                                            errorMessage={form.formState.errors.firstname?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -236,6 +272,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Familienaam'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.lastname !== undefined}
+                                                            errorMessage={form.formState.errors.lastname?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -262,6 +300,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                                 labelPlacement='outside'
                                                                 className='text-sm font-medium leading-6'
                                                                 color='default'
+                                                                isInvalid={form.formState.errors.birthdate !== undefined}
+                                                                errorMessage={form.formState.errors.birthdate?.message}
                                                             />
                                                         </I18nProvider>
                                                     </FormControl>
@@ -289,6 +329,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Selecteer het niveau'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
+                                                            isInvalid={form.formState.errors.level !== undefined}
+                                                            errorMessage={form.formState.errors.level?.message}
                                                         >
                                                             {levels!.map((level) => (
                                                                 <SelectItem key={level.levelid}>
@@ -326,6 +368,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                                 </div>
                                                             }
                                                             color='default'
+                                                            isInvalid={form.formState.errors.payment_amount !== undefined}
+                                                            errorMessage={form.formState.errors.payment_amount?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -352,6 +396,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='+32 XXX XX XX XX'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.phone_1 !== undefined}
+                                                            errorMessage={form.formState.errors.phone_1?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -377,6 +423,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='+32 XXX XX XX XX'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.phone_2 !== undefined}
+                                                            errorMessage={form.formState.errors.phone_2?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -403,6 +451,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Selecteer het klastype'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
+                                                            isInvalid={form.formState.errors.classtype !== undefined}
+                                                            errorMessage={form.formState.errors.classtype?.message}
                                                         >
                                                             {ClassTypeEnum.options.map((classType) => (
                                                                 <SelectItem key={classType} description={classType == ClassTypeEnum.Enum.Weekend ? '€240' : '€130'}>
@@ -438,6 +488,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             }
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.email_1 !== undefined}
+                                                            errorMessage={form.formState.errors.email_1?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -466,6 +518,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             startContent={
                                                                 <MailIcon className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
                                                             }
+                                                            isInvalid={form.formState.errors.email_2 !== undefined}
+                                                            errorMessage={form.formState.errors.email_2?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -516,6 +570,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Straat'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.street !== undefined}
+                                                            errorMessage={form.formState.errors.street?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -542,6 +598,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='XX'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.housenumber !== undefined}
+                                                            errorMessage={form.formState.errors.housenumber?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -568,6 +626,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='XXXX'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.postalcode !== undefined}
+                                                            errorMessage={form.formState.errors.postalcode?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -594,6 +654,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             placeholder='Gemeente'
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.city !== undefined}
+                                                            errorMessage={form.formState.errors.city?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -619,6 +681,8 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                                                             label='Opmerkingen'
                                                             labelPlacement='outside'
                                                             color='default'
+                                                            isInvalid={form.formState.errors.remarks !== undefined}
+                                                            errorMessage={form.formState.errors.remarks?.message}
                                                         />
                                                     </FormControl>
                                                 </FormItem>
@@ -638,7 +702,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         </CardFooter>
                     </Card>
                 </form>
-            </Form >
+            </Form>
         </>
     )
 }

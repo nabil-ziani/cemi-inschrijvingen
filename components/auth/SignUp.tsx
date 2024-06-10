@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from "next/link";
 import Image from "next/image";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -10,13 +10,16 @@ import { useForm } from 'react-hook-form';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
 import { EyeFilledIcon } from '../icons/EyeFilledIcon';
 import { Input } from '@nextui-org/react';
-import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from '../icons/MailIcon';
 import toast from 'react-hot-toast';
-import { revalidatePath } from 'next/cache';
+import { signUp } from '@/app/(auth)/actions';
 
-export function SignUp() {
+interface SignUpProps {
+    error: string
+}
+
+export function SignUp({ error }: SignUpProps) {
     const [loading, setLoading] = useState(false)
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -33,7 +36,6 @@ export function SignUp() {
 
     type SignUpFormData = z.infer<typeof SignUpSchema>;
 
-    const supabase = createClient()
     const router = useRouter()
     const { register, handleSubmit, formState: { errors }, reset } = useForm<SignUpFormData>({
         resolver: zodResolver(SignUpSchema),
@@ -43,27 +45,30 @@ export function SignUp() {
     const toggleVisibility = () => setPasswordVisible(!passwordVisible);
     const toggleConfirmVisibility = () => setConfirmPasswordVisible(!confirmPasswordVisible);
 
+    // When component is mounted -> check for error message
+    useEffect(() => {
+        if (error) {
+            if (error == 'User already registered') {
+                toast.error('Er bestaat al een account voor het opgegeven mailadres');
+                router.push('/sign-in');
+            } else {
+                toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
+            }
+        }
+    }, [error])
+
     const handleFormSubmit = async (formData: SignUpFormData) => {
         setLoading(true);
         try {
-            const data = {
-                email: formData.email as string,
-                password: formData.password as string,
-            }
-
-            const { error } = await supabase.auth.signUp(data)
+            await signUp(formData)
 
             if (error) {
-                if (error.message == 'User already registered') {
+                if (error == 'User already registered') {
                     toast.error('Er bestaat al een account voor het opgegeven mailadres');
                     router.push('/sign-in');
                 } else {
                     toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
                 }
-                reset()
-            } else {
-                toast.success('Je account is aangemaakt!')
-                router.push('/sign-in');
             }
         } catch (e) {
             toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
