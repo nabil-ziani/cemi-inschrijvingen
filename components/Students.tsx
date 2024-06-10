@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react'
 import StudentsTable from './StudentsTable'
-import { EnrollmentWithStudent, EnrollmentWithStudentClass } from '@/utils/types'
+import { EnrollmentWithStudentClass } from '@/utils/types'
 import toast from 'react-hot-toast'
 import { createClient } from '@/utils/supabase/client'
 

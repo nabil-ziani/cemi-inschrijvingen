@@ -132,7 +132,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 return (
                     <div className="flex flex-col">
                         <p className="text-bold text-sm capitalize">{enrollment.class?.class_type}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{enrollment.class.naam}</p>
+                        <p className="text-bold text-sm capitalize text-default-400">{enrollment.class?.naam}</p>
                     </div>
                 )
             case "actions":

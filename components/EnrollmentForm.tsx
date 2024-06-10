@@ -75,7 +75,7 @@ const formSchema = z.object({
     postalcode: z.string().min(1, { message: 'Verplicht veld' }),
     city: z.string().min(1, { message: 'Verplicht veld' }),
     remarks: z.union([z.literal(''), z.string()]),
-    payment_amount: z.number().min(1, { message: 'Verplicht veld' }),
+    payment_amount: z.number(),
     level: z.string().min(1, { message: 'Verplicht veld' }),
     classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
@@ -85,6 +85,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
+    const [valueClassType, setValueClassType] = useState<any>(new Set([]))
     const [loading, setLoading] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -201,7 +202,6 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
             setModalType('fail')
             handleOpen()
         }
-
     }, [enrollment])
 
     return (
@@ -386,6 +386,21 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                             label='Betaling'
                                                             labelPlacement='outside'
                                                             placeholder='0.00'
+                                                            description={
+                                                                field.value === 0
+                                                                    ? ''
+                                                                    : Array.from(valueClassType)[0] === ClassTypeEnum.Enum.Weekend
+                                                                        ? (field.value === 240
+                                                                            ? 'Volledig ✅'
+                                                                            : field.value < 240 && field.value > 0
+                                                                                ? 'Voorschot 👍'
+                                                                                : 'Teveel ❌')
+                                                                        : (field.value === 130
+                                                                            ? 'Volledig ✅'
+                                                                            : field.value < 130 && field.value > 0
+                                                                                ? 'Voorschot 👍'
+                                                                                : 'Teveel ❌')
+                                                            }
                                                             className='text-sm font-medium leading-6'
                                                             startContent={
                                                                 <div className="pointer-events-none flex items-center">
@@ -476,6 +491,8 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                             placeholder='Selecteer het klastype'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
+                                                            selectedKeys={valueClassType}
+                                                            onSelectionChange={setValueClassType}
                                                             isInvalid={form.formState.errors.classtype !== undefined}
                                                             errorMessage={form.formState.errors.classtype?.message}
                                                         >
@@ -719,7 +736,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
                             {
-                                enrollment?.completed || !enrollment?.payment_complete || enrollment?.student.repeating_year ?
+                                enrollment && (enrollment?.completed || !enrollment?.payment_complete || enrollment?.student.repeating_year) ?
                                     <Button variant='solid' isDisabled>
                                         {
                                             enrollment?.completed ? 'Reeds ingeschreven'
@@ -729,7 +746,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                         }
                                     </Button>
                                     :
-                                    <SubmitButton text={loading ? 'Laden...' : 'Herinschrijven'} loading={loading} />
+                                    <SubmitButton text={loading ? '' : 'Herinschrijven'} loading={loading} />
                             }
                         </CardFooter>
                     </Card>
