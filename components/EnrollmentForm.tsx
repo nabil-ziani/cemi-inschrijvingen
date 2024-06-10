@@ -19,6 +19,7 @@ import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js'
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -31,8 +32,36 @@ const formSchema = z.object({
     lastname: z.string().min(1, { message: 'Verplicht veld' }),
     gender: z.boolean(),
     birthdate: z.instanceof(CalendarDate),
-    phone_1: z.string().min(1, { message: 'Verplicht veld' }),
-    phone_2: z.union([z.literal(''), z.string()]),
+    phone_1: z.string().min(1, { message: 'Verplicht veld' }).transform((value, ctx) => {
+        const phoneNumber = parsePhoneNumber(value, {
+            defaultCountry: 'BE'
+        })
+
+        if (!phoneNumber?.isValid()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Telefoonnummer is niet geldig",
+            });
+            return z.NEVER;
+        }
+
+        return phoneNumber.formatInternational();
+    }),
+    phone_2: z.union([z.literal(''), z.string().transform((value, ctx) => {
+        const phoneNumber = parsePhoneNumber(value, {
+            defaultCountry: 'BE'
+        })
+
+        if (!phoneNumber?.isValid()) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Telefoonnummer is niet geldig",
+            });
+            return z.NEVER;
+        }
+
+        return phoneNumber.formatInternational();
+    })]),
     email_1: z.string().min(1, { message: 'Verplicht veld' }).email({ message: 'Email is niet geldig' }),
     email_2: z.union([z.literal(''), z.string().email({ message: 'Email is niet geldig' })]),
     homeAlone: z.boolean(),
