@@ -128,7 +128,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             setLoading(true);
 
             const { data: studentData, error: studentError } = await supabase
-                .from('student')
+                .from('student_duplicate')
                 .upsert({
                     studentid: enrollment ? enrollment.studentid : undefined,
                     firstname: data.firstname,
@@ -153,7 +153,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             const studentId = studentData[0].studentid;
 
             const { data: enrollmentData, error: enrollmentError } = await supabase
-                .from('enrollment')
+                .from('enrollment_duplicate')
                 .upsert({
                     enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
                     studentid: studentId,

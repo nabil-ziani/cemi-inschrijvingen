@@ -25,7 +25,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const enrollStudentOut = async () => {
         try {
-            const { data, error: enrollOutError } = await supabase.from('enrollment').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', enrollment.id).select()
+            const { data, error: enrollOutError } = await supabase.from('enrollment_duplicate').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', enrollment.id).select()
 
             if (enrollOutError) throw enrollOutError;
 
@@ -38,7 +38,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const updateSchoolResult = async () => {
         try {
-            const { data, error: schoolResultError } = await supabase.from('enrollment').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
+            const { data, error: schoolResultError } = await supabase.from('enrollment_duplicate').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
 
             if (schoolResultError) throw schoolResultError;
 
