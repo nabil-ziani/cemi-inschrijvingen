@@ -26,7 +26,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
+            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
 
             if (error) {
                 console.error('Error fetching enrollment:', error);
