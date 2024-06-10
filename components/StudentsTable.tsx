@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, Tooltip, useDisclosure } from "@nextui-org/react";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
@@ -94,15 +94,23 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         });
     }, [sortDescriptor, items]);
 
-    // --- Supabase Realtime Events ---
-    const handleInserts = (payload) => {
-        router.refresh()
-    }
+    // // --- Supabase Realtime Events ---
+    // useEffect(() => {
+    //     const handleInserts = (payload) => {
+    //         console.log(payload);
+    //         router.refresh();
+    //     }
 
-    supabase
-        .channel('enrollment_duplicate')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_duplicate' }, handleInserts)
-        .subscribe()
+    //     const subscription = supabase
+    //         .channel('enrollment_duplicate')
+    //         .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_duplicate' }, handleInserts)
+    //         .subscribe();
+
+    //     // Cleanup function to unsubscribe
+    //     return () => {
+    //         subscription.unsubscribe();
+    //     }
+    // }, []); // Empty dependency array ensures this runs only once
 
     const renderCell = useCallback((enrollment: EnrollmentWithStudentClass, columnKey: React.Key) => {
         const cellValue = enrollment[columnKey as keyof EnrollmentWithStudentClass];
@@ -124,7 +132,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 );
             case "payment_complete":
                 return (
-                    <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue ? 'success' : 'danger'}>
+                    <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue == true ? 'success' : 'danger'}>
                         {formatCurrency(enrollment.payment_amount)}
                     </Chip>
                 );

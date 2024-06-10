@@ -29,7 +29,6 @@ const ResetPassword = () => {
             });
 
             if (error) {
-                console.log(error)
                 toast.error('Oeps, probeer het later opnieuw.')
             } else {
                 toast.success('Indien er een account gelinkt is ontvang je een mail met verdere instructies!')

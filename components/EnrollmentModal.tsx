@@ -30,7 +30,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
             if (error) throw error;
 
             toast.success(`${enrollment.student.name} is uitgeschreven.`)
-
+            router.refresh()
         } catch (error) {
             toast.error('Oeps, er is iets misgegaan tijdens het uitschrijven')
         }
