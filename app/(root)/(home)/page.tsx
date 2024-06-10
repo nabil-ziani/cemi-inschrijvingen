@@ -8,9 +8,8 @@ export default async function Index() {
 
   // --- Page Protection ---
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/sign-in')
-  }
+
+  if (!user) redirect('/sign-in')
 
   // --- Get Enrollments of 2023 ---
   const getEnrollments = async () => {

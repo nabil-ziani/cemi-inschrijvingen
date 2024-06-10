@@ -47,7 +47,8 @@ export interface Student {
     postalcode: string | null
     remarks: string
     street: string | null
-    studentid: string
+    studentid: string,
+    repeating_year: boolean | null
 }
 
 export interface Level {

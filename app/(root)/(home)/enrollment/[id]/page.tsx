@@ -13,25 +13,21 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
 
     if (!user) return redirect("/sign-in");
 
-    // --- Get all levels to prefill select with options ---
+    // --- Get levels to prefill select with options ---
     const { data: levels, error: levelsError } = await supabase.from('level_duplicate').select()
 
-    if (levelsError) {
-        throw new Error("Error fetching levels" + levelsError);
-    }
+    if (levelsError) throw new Error("Error fetching levels" + levelsError);
 
-    // --- Get old enrollment to prefill form with existing data ---
+    // --- Get old enrollment (2023) to prefill form with existing data ---
     // This will always be from year 2023, because user comes from table where only 2023-records are shown
     const getCurrentEnrollment = async (): Promise<EnrollmentWithStudentClass | null> => {
+        // ID will be null when student is new (no 2023-enrollment)
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
+            const { data, error: enrollmentError } = await supabase.from('enrollment_duplicate').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
 
-            if (error) {
-                console.error('Error fetching enrollment:', error);
-                return null;
-            }
+            if (enrollmentError) throw new Error("Error fetching enrollments" + enrollmentError);
 
             return data;
         }
@@ -39,13 +35,6 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
 
     const enrollment = await getCurrentEnrollment()
     const student = enrollment?.student
-
-    // --- TODO: check if user has an enrollment of year 2022 ---
-    // This would mean the user is repeating the same level -> if passed = false, enrollment should not be allowed (excluding exceptions)
-    const isRepeatingLevel = async (studentid: string): Promise<boolean> => {
-        //...
-        return false
-    }
 
     return (
         <>

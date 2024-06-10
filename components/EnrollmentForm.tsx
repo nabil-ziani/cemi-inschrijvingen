@@ -86,7 +86,6 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
     const supabase = createClient();
     const router = useRouter()
 
-    // Every enrollment should have a levelid, for the moment this is not the case for 2022 enrollments (to fix!)
     const currentLevel = getLevelById(levels!, enrollment?.levelid!)
 
     let newLevel: Level | undefined;
@@ -694,8 +693,15 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
                             {
-                                enrollment?.completed ?
-                                    <Button variant='solid' isDisabled>Reeds ingeschreven</Button>
+                                enrollment?.completed || !enrollment.payment_complete || enrollment.student.repeating_year ?
+                                    <Button variant='solid' isDisabled>
+                                        {
+                                            enrollment?.completed ? 'Reeds ingeschreven'
+                                                : !enrollment.payment_complete ? 'Betaling onvoltooid'
+                                                    : enrollment.student.repeating_year ? 'Student is vorig jaar blijvenzitten'
+                                                        : ''
+                                        }
+                                    </Button>
                                     :
                                     <SubmitButton text={loading ? 'Laden...' : 'Herinschrijven'} loading={loading} />
                             }

@@ -258,6 +258,7 @@ export type Database = {
           phone_2: string | null
           postalcode: string | null
           remarks: string
+          repeating_year: boolean | null
           street: string | null
           studentid: string
         }
@@ -275,6 +276,7 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
@@ -292,6 +294,7 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
@@ -312,6 +315,7 @@ export type Database = {
           phone_2: string | null
           postalcode: string | null
           remarks: string
+          repeating_year: boolean | null
           street: string | null
           studentid: string
         }
@@ -329,6 +333,7 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
@@ -346,6 +351,7 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
