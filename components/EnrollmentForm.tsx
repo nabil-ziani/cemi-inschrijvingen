@@ -10,16 +10,16 @@ import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
 import { ClassTypeEnum, EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
-import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { createClient } from '@/utils/supabase/client';
 import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
-import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js'
+import { parsePhoneNumber } from 'libphonenumber-js'
+import { z } from "zod"
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
