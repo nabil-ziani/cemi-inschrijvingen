@@ -5,7 +5,7 @@ import EnrollmentForm from '@/components/EnrollmentForm';
 import { capitalize } from '@/lib/utils';
 import { EnrollmentWithStudentClass } from '@/utils/types';
 
-const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) => {
+const EnrollmentPage = async ({ params: { id, type } }: { params: { id: string, type: 'enroll' | 'update' } }) => {
     const supabase = createClient();
 
     // --- Auth protect page ---
@@ -42,7 +42,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
                 <h1 className='text-3xl font-bold'>{student ? `${capitalize(`${student.firstname} ${student.lastname}`)}` : 'Nieuwe inschrijving'}</h1>
             </div>
             <Divider className="my-5" />
-            <EnrollmentForm levels={levels} enrollment={enrollment} />
+            <EnrollmentForm levels={levels} enrollment={enrollment} type={type} />
         </>
     )
 }

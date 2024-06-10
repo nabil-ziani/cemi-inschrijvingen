@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button } from '@nextui-org/react'
+import { useEffect, useState } from 'react';
+import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -20,10 +20,12 @@ import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
 import { parsePhoneNumber } from 'libphonenumber-js'
 import { z } from "zod"
+import EnrollmentModal from './EnrollmentModal';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
     enrollment: EnrollmentWithStudentClass | null
+    type: 'enroll' | 'update'
 }
 
 // *** ZOD VALIDATION ***
@@ -78,13 +80,21 @@ const formSchema = z.object({
     classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
 
-const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
+const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { id: string, name: string, payment_amount: number } }>()
+    const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
     const [loading, setLoading] = useState(false)
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const supabase = createClient();
     const router = useRouter()
+
+    // MODAL
+    const handleOpen = () => {
+        onOpen();
+    }
 
     const currentLevel = getLevelById(levels!, enrollment?.levelid!)
 
@@ -99,27 +109,28 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
         resolver: zodResolver(formSchema),
         mode: 'onBlur',
         defaultValues: {
-            firstname: enrollment && capitalize(enrollment?.student?.firstname!) || '',
-            lastname: enrollment && capitalize(enrollment?.student?.lastname!) || '',
+            firstname: enrollment && capitalize(enrollment.student?.firstname) || '',
+            lastname: enrollment && capitalize(enrollment.student?.lastname) || '',
             birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || new CalendarDate(2000, 1, 1),
-            gender: enrollment && enrollment?.student?.gender == 'f' ? true : false || false,
-            phone_1: enrollment && enrollment?.student?.phone_1 || '',
-            phone_2: enrollment && enrollment?.student?.phone_2 || '',
-            email_1: enrollment && enrollment?.student?.email_1 || '',
-            email_2: enrollment && enrollment?.student?.email_2 || '',
-            homeAlone: enrollment && enrollment?.student?.homeAlone || false,
-            street: enrollment && enrollment?.student?.street || '',
-            housenumber: enrollment && enrollment?.student?.housenumber || '',
-            postalcode: enrollment && enrollment?.student?.postalcode || '',
-            city: enrollment && enrollment?.student?.city || '',
-            remarks: enrollment && enrollment?.student?.remarks || '',
-            payment_amount: enrollment && enrollment?.payment_amount || 0,
+            gender: enrollment && enrollment.student?.gender == 'f' ? true : false || false,
+            phone_1: enrollment && enrollment.student?.phone_1 || '',
+            phone_2: enrollment && enrollment.student?.phone_2 || '',
+            email_1: enrollment && enrollment.student?.email_1 || '',
+            email_2: enrollment && enrollment.student?.email_2 || '',
+            homeAlone: enrollment && enrollment.student?.homeAlone || false,
+            street: enrollment && capitalize(enrollment.student?.street) || '',
+            housenumber: enrollment && enrollment.student?.housenumber || '',
+            postalcode: enrollment && enrollment.student?.postalcode || '',
+            city: enrollment && capitalize(enrollment.student?.city) || '',
+            remarks: enrollment && enrollment.student?.remarks || '',
             level: enrollment && newLevel?.levelid || '',
-            classtype: enrollment && enrollment?.class?.class_type || ''
+            classtype: enrollment && enrollment.class?.class_type || '',
+            payment_amount: type == 'update' ? enrollment?.payment_amount : 0
         }
     });
 
     // --- Make new enrollment for year 2024 ---
+    // fix bug that payment_amount can not be 0!
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             // If enrollment is null, new student will be created otherwise linked student will be updated
@@ -177,6 +188,21 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
             router.push('/')
         }
     };
+
+    useEffect(() => {
+        if (enrollment && !enrollment.payment_complete) {
+            setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
+            setModalType('payment')
+            handleOpen()
+        }
+
+        else if (enrollment && enrollment.student.repeating_year && !enrollment.passed) {
+            setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
+            setModalType('fail')
+            handleOpen()
+        }
+
+    }, [enrollment])
 
     return (
         <>
@@ -693,12 +719,12 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
                             {
-                                enrollment?.completed || !enrollment.payment_complete || enrollment.student.repeating_year ?
+                                enrollment?.completed || !enrollment?.payment_complete || enrollment?.student.repeating_year ?
                                     <Button variant='solid' isDisabled>
                                         {
                                             enrollment?.completed ? 'Reeds ingeschreven'
-                                                : !enrollment.payment_complete ? 'Betaling onvoltooid'
-                                                    : enrollment.student.repeating_year ? 'Student is vorig jaar blijvenzitten'
+                                                : !enrollment?.payment_complete ? 'Betaling onvoltooid'
+                                                    : enrollment?.student.repeating_year ? 'Jaar herhaald en niet geslaagd'
                                                         : ''
                                         }
                                     </Button>
@@ -709,6 +735,7 @@ const EnrollmentForm = ({ levels, enrollment }: EnrollmentFormProps) => {
                     </Card>
                 </form>
             </Form>
+            <EnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} type={modalType} />
         </>
     )
 }

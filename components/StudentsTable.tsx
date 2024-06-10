@@ -7,15 +7,16 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { UserCheck, UserX } from "lucide-react";
-import { Enrollment, EnrollmentWithStudent } from "@/utils/types";
+import { Edit3, UserCheck, UserX } from "lucide-react";
+import { Enrollment, EnrollmentWithStudentClass } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
-const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "passed", "payment_complete", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "passed", "payment_complete", "actions"];
 
 interface StudentsProps {
-    data: EnrollmentWithStudent[],
+    data: EnrollmentWithStudentClass[],
     loading: boolean
 }
 
@@ -29,11 +30,12 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
-    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { name: string } }>()
-    const [modalType, setModalType] = useState<'delete' | 'update' | 'enroll'>('enroll')
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { id: string, name: string, payment_amount: number } }>()
+    const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const router = useRouter()
+    const supabase = createClient()
 
     // MODAL
     const handleOpen = () => {
@@ -92,8 +94,18 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         });
     }, [sortDescriptor, items]);
 
-    const renderCell = useCallback((enrollment: EnrollmentWithStudent, columnKey: React.Key) => {
-        const cellValue = enrollment[columnKey as keyof EnrollmentWithStudent];
+    // --- Supabase Realtime Events ---
+    const handleInserts = (payload) => {
+        router.refresh()
+    }
+
+    supabase
+        .channel('enrollment_duplicate')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_duplicate' }, handleInserts)
+        .subscribe()
+
+    const renderCell = useCallback((enrollment: EnrollmentWithStudentClass, columnKey: React.Key) => {
+        const cellValue = enrollment[columnKey as keyof EnrollmentWithStudentClass];
 
         switch (columnKey) {
             case "firstname":
@@ -106,30 +118,36 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 );
             case "passed":
                 return (
-                    <div className="flex flex-col">
-                        {/* <p className="text-bold text-small capitalize">{cellValue == null && 'N/A'}</p> */}
-                        <p className="text-bold text-tiny capitalize text-default-400">{cellValue == null && 'N/A'}</p>
-                    </div>
+                    <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue == null ? 'default' : cellValue ? 'success' : 'danger'}>
+                        {cellValue == null ? 'N/A' : cellValue ? 'Geslaagd' : 'Niet geslaagd'}
+                    </Chip>
                 );
             case "payment_complete":
                 return (
-                    <Chip className="capitalize" size="sm" variant="flat" color={cellValue ? 'success' : 'danger'}>
+                    <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue ? 'success' : 'danger'}>
                         {formatCurrency(enrollment.payment_amount)}
                     </Chip>
                 );
+            case "class_type":
+                return (
+                    <div className="flex flex-col">
+                        <p className="text-bold text-sm capitalize">{enrollment.class?.class_type}</p>
+                        <p className="text-bold text-sm capitalize text-default-400">{enrollment.class.naam}</p>
+                    </div>
+                )
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
                         {enrollment.completed ?
                             <Tooltip content="Wijzigen">
-                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-danger cursor-pointer active:opacity-50">
-                                    <UserX strokeWidth={1} />
+                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                    <Edit3 strokeWidth={1} />
                                 </span>
                             </Tooltip>
                             :
                             <Tooltip content="Herinschrijven">
                                 <span onClick={() => {
-                                    setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                    setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                                     setModalType('enroll')
                                     handleOpen()
                                 }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
@@ -139,7 +157,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, student: { name: `${capitalize(enrollment.student.firstname)}` } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                                 setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">
@@ -240,9 +258,6 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        {/* <Button color="primary" endContent={<PlusIcon />}>
-                            Nieuwe student
-                        </Button> */}
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
@@ -343,7 +358,6 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         : 'Geen inschrijvingen gevonden'
                 } items={sortedItems}>
                     {(item) => (
-                        // Go to detail page onClick
                         <TableRow key={item.studentid} >
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                         </TableRow>
