@@ -48,6 +48,9 @@ const formSchema = z.object({
         return phoneNumber.formatInternational();
     }),
     phone_2: z.union([z.literal(''), z.string().transform((value, ctx) => {
+        // This field is optional
+        if (!value) return
+
         const phoneNumber = parsePhoneNumber(value, {
             defaultCountry: 'BE'
         })
