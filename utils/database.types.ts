@@ -80,7 +80,7 @@ export type Database = {
             foreignKeyName: "class_duplicate_levelid_fkey"
             columns: ["levelid"]
             isOneToOne: false
-            referencedRelation: "level"
+            referencedRelation: "level_duplicate"
             referencedColumns: ["levelid"]
           },
         ]
@@ -194,21 +194,21 @@ export type Database = {
             foreignKeyName: "enrollment_duplicate_classid_fkey"
             columns: ["classid"]
             isOneToOne: false
-            referencedRelation: "class"
+            referencedRelation: "class_duplicate"
             referencedColumns: ["classid"]
           },
           {
             foreignKeyName: "enrollment_duplicate_levelid_fkey"
             columns: ["levelid"]
             isOneToOne: false
-            referencedRelation: "level"
+            referencedRelation: "level_duplicate"
             referencedColumns: ["levelid"]
           },
           {
             foreignKeyName: "enrollment_duplicate_studentid_fkey"
             columns: ["studentid"]
             isOneToOne: false
-            referencedRelation: "student"
+            referencedRelation: "student_duplicate"
             referencedColumns: ["studentid"]
           },
         ]

@@ -27,7 +27,7 @@ const Students = ({ data }: StudentsProps) => {
         try {
             const fetchData = async () => {
                 const getEnrollments = async (year: string) => {
-                    const { data } = await supabase.from('enrollment_duplicate').select(`*, student(*), class(*)`).eq('year', year).eq('status', 'Heringeschreven');
+                    const { data } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*)`).eq('year', year).eq('status', 'Heringeschreven');
                     return data;
                 }
 

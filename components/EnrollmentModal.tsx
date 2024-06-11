@@ -44,7 +44,6 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
             router.push(`/enrollment/${enrollment.id}?type=enroll`)
             toast.success(`Opgeslagen!`)
-
         } catch (error) {
             toast.error('Oeps, er lijkt iets verkeerd te zijn gegaan')
         }
@@ -52,11 +51,14 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const updatePayment = async () => {
         try {
-            const { error } = await supabase.from('enrollment_duplicate').update({ payment_complete: true }).eq('enrollmentid', enrollment.id).select()
+            const { error } = await supabase.from('enrollment_duplicate').update({
+                payment_complete: true,
+                // payment_amount: dit ook goed zetten!
+            }).eq('enrollmentid', enrollment.id).select()
 
             if (error) throw error;
 
-            router.push(`/enrollment/${enrollment.id}?type=enroll`)
+            router.refresh()
             toast.success(`Betaling verwerkt!`)
 
         } catch (error) {
@@ -66,11 +68,12 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const allowEnrollmentException = async () => {
         try {
-            const { error } = await supabase.from('student_duplicate').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
+            const { data, error } = await supabase.from('student_duplicate').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
+            console.log(data)
 
             if (error) throw error;
 
-            router.push(`/enrollment/${enrollment.id}?type=enroll`)
+            router.refresh()
             toast.success(`Uitzondering gemaakt!`)
 
         } catch (error) {
