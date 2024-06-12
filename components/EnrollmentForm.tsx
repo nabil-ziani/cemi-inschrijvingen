@@ -21,11 +21,12 @@ import { toast } from 'react-hot-toast';
 import { parsePhoneNumber } from 'libphonenumber-js'
 import { z } from "zod"
 import EnrollmentModal from './EnrollmentModal';
+import { useSearchParams } from 'next/navigation'
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
     enrollment: EnrollmentWithStudentClass | null,
-    type: 'enroll' | 'update' | 'view',
+    // type: 'enroll' | 'update' | 'view',
     newEnrollment?: EnrollmentWithStudentClass | null
 }
 
@@ -81,7 +82,7 @@ const formSchema = z.object({
     classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
 
-const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentFormProps) => {
+const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student_duplicate?.homeAlone || false);
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student_duplicate?.gender == 'f' ? true : false || false);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
@@ -92,6 +93,7 @@ const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentF
     const { isOpen, onOpen, onClose } = useDisclosure();
     const supabase = createClient();
     const router = useRouter()
+    const searchParams = useSearchParams()
 
     // MODAL
     const handleOpen = () => {
@@ -99,6 +101,7 @@ const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentF
     }
 
     const currentLevel = getLevelById(levels!, enrollment?.levelid!)
+    const type = searchParams.get('type')
 
     let newLevel: Level | undefined;
     if (enrollment?.passed) {
@@ -218,33 +221,39 @@ const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentF
                 handleOpen()
             }
         }
+        console.log(type)
     }, [enrollment])
 
     return (
         <>
-            {enrollment && <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
-                <CardHeader className='flex justify-between items-center'>
-                    <div className='flex items-center'>
-                        <h2 className='mr-6 font-medium leading-none text-default-700'>
-                            {!enrollment.completed ?
-                                (
-                                    <>
-                                        <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                                        &nbsp; {enrollment?.student_duplicate?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
-                                    </>
-                                )
-                                :
-                                (
-                                    <div className='flex items-center w-full justify-end'>
-                                        <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
-                                        &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
-                                    </div>
-                                )
-                            }
-                        </h2>
-                    </div>
-                </CardHeader>
-            </Card>}
+            {(enrollment && type === 'enroll') &&
+                <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
+                    <CardHeader className='flex justify-between items-center'>
+                        <div className='flex items-center'>
+                            <h2 className='mr-6 font-medium leading-none text-default-700'>
+                                <div className='flex items-center w-full justify-end'>
+                                    <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                    &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
+                                </div>
+                            </h2>
+                        </div>
+                    </CardHeader>
+                </Card>
+            }
+            {enrollment && type == 'view' &&
+                <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
+                    <CardHeader className='flex justify-between items-center'>
+                        <div className='flex items-center'>
+                            <h2 className='mr-6 font-medium leading-none text-default-700'>
+                                <div className='flex items-center w-full justify-end'>
+                                    <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                    &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
+                                </div>
+                            </h2>
+                        </div>
+                    </CardHeader>
+                </Card>
+            }
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <Card className='my-5 py-5 px-5 xl:max-w-[1800px]'>
@@ -763,13 +772,14 @@ const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentF
                                                             isDisabled={enrollment?.completed}
                                                             value={field.value}
                                                             onChange={field.onChange}
-                                                            placeholder="Geef eventuele opmerkingen hier in"
+                                                            placeholder="Geef opmerkingen hier in"
                                                             className="text-sm font-medium leading-6"
                                                             label='Opmerkingen'
                                                             labelPlacement='outside'
                                                             color='default'
                                                             isInvalid={form.formState.errors.remarks !== undefined}
                                                             errorMessage={form.formState.errors.remarks?.message}
+                                                            description='Eventuele voorkeuren voor lestijden kunnen niet gegarandeerd worden!!'
                                                         />
                                                     </FormControl>
                                                 </FormItem>

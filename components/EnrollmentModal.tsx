@@ -17,7 +17,7 @@ interface DeleteEnrollmentModalProps {
 }
 
 const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollmentModalProps) => {
-    const [passedIsSelected, setPassedIsSelected] = useState(true);
+    const [passedIsSelected, setPassedIsSelected] = useState(false);
 
     const supabase = createClient()
     const router = useRouter()

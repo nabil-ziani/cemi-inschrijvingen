@@ -7,7 +7,7 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { UserCheck, UserX } from "lucide-react";
+import { Edit3, EditIcon, UserCheck, UserX } from "lucide-react";
 import { Enrollment, EnrollmentWithStudentClass } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import { useRouter } from "next/navigation";
@@ -154,19 +154,26 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                 </span>
                             </Tooltip>
                             :
-                            <Tooltip content="Herinschrijven">
-                                <span onClick={() => {
-                                    if (enrollment.passed == null) {
-                                        setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
-                                        setModalType('enroll')
-                                        handleOpen()
-                                    } else {
-                                        router.push(`/enrollment/${enrollment.enrollmentid}?type=enroll`)
-                                    }
-                                }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                    <UserCheck strokeWidth={1} />
-                                </span>
-                            </Tooltip>
+                            enrollment.year == 2024 ?
+                                <Tooltip content="Wijzigen">
+                                    <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <Edit3 strokeWidth={1} />
+                                    </span>
+                                </Tooltip>
+                                :
+                                <Tooltip content="Herinschrijven">
+                                    <span onClick={() => {
+                                        if (enrollment.passed == null) {
+                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                            setModalType('enroll')
+                                            handleOpen()
+                                        } else {
+                                            router.push(`/enrollment/${enrollment.enrollmentid}?type=enroll`)
+                                        }
+                                    }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                        <UserCheck strokeWidth={1} />
+                                    </span>
+                                </Tooltip>
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
