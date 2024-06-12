@@ -1,17 +1,18 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, Tooltip, useDisclosure } from "@nextui-org/react";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { Edit3, UserCheck, UserX } from "lucide-react";
+import { UserCheck, UserX } from "lucide-react";
 import { Enrollment, EnrollmentWithStudentClass } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { EyeIcon } from "./icons/EyeIcon";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "passed", "payment_complete", "actions"];
 
@@ -30,7 +31,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
-    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { id: string, name: string, payment_amount: number } }>()
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -147,16 +148,16 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 return (
                     <div className="relative flex items-center gap-3">
                         {enrollment.completed ?
-                            <Tooltip content="Wijzigen">
-                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=update`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                    <Edit3 strokeWidth={1} />
+                            <Tooltip content="Bekijken">
+                                <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=view`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                    <EyeIcon strokeWidth={1} />
                                 </span>
                             </Tooltip>
                             :
                             <Tooltip content="Herinschrijven">
                                 <span onClick={() => {
                                     if (enrollment.passed == null) {
-                                        setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                        setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                                         setModalType('enroll')
                                         handleOpen()
                                     } else {
@@ -169,7 +170,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                                 setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">
@@ -329,8 +330,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 topContent={topContent}
                 topContentPlacement="outside"
                 onSortChange={setSortDescriptor}
-            // TODO: navigate to detail page
-            // onRowAction={(key) => router.push(`/student/${key}`)}
+            // disabledKeys={data.map((e) => e.completed ? e.studentid : '')}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (
@@ -370,13 +370,18 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         : 'Geen inschrijvingen gevonden'
                 } items={sortedItems}>
                     {(item) => (
-                        <TableRow key={item.studentid} >
+                        <TableRow key={item.studentid}>
                             {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                         </TableRow>
                     )}
                 </TableBody>
             </Table >
-            <EnrollmentModal isOpen={isOpen} onClose={onClose} enrollment={selectedStudent} type={modalType} />
+            <EnrollmentModal
+                isOpen={isOpen}
+                onClose={onClose}
+                enrollment={selectedStudent}
+                type={modalType}
+            />
         </>
     )
 }

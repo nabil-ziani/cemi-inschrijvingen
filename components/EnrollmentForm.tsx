@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure } from '@nextui-org/react'
+import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure, Link } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -24,8 +24,9 @@ import EnrollmentModal from './EnrollmentModal';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
-    enrollment: EnrollmentWithStudentClass | null
-    type: 'enroll' | 'update'
+    enrollment: EnrollmentWithStudentClass | null,
+    type: 'enroll' | 'update' | 'view',
+    newEnrollment?: EnrollmentWithStudentClass | null
 }
 
 // *** ZOD VALIDATION ***
@@ -80,12 +81,12 @@ const formSchema = z.object({
     classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
 
-const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
+const EnrollmentForm = ({ levels, enrollment, type, newEnrollment }: EnrollmentFormProps) => {
     const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student_duplicate?.homeAlone || false);
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student_duplicate?.gender == 'f' ? true : false || false);
-    const [selectedStudent, setSelectedStudent] = useState<{ id: string, student: { id: string, name: string, payment_amount: number } }>()
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
-    const [valueClassType, setValueClassType] = useState<any>(new Set([]))
+    const [valueClassType, setValueClassType] = useState<any>(new Set([enrollment?.class_duplicate?.class_type]))
     const [loading, setLoading] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -162,10 +163,24 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
 
             const studentId = studentData[0].studentid;
 
-            const { data: enrollmentData, error: enrollmentError } = await supabase
+            // --- Update 2023 enrollment, set completed to true ---
+            // RLS does not enable new row create -> TO FIX!
+            const { data: enrollmentUpdateData, error: enrollmentUpdateError } = await supabase
                 .from('enrollment_duplicate')
                 .upsert({
                     enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
+                    studentid: studentId,
+                    year: 2023,
+                    completed: true
+                }, { onConflict: 'enrollmentid' })
+                .select();
+
+            if (enrollmentUpdateError) throw enrollmentUpdateError;
+
+            // --- Create NEW 2024 enrollment ---
+            const { data: enrollmentData, error: enrollmentError } = await supabase
+                .from('enrollment_duplicate')
+                .insert({
                     studentid: studentId,
                     classid: null,
                     year: 2024,
@@ -174,14 +189,15 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                     status: EnrollmentStatusEnum.Enum.Heringeschreven,
                     levelid: data.level,
                     payment_complete: data.classtype == ClassTypeEnum.Enum.Weekend ? data.payment_amount == 240 : data.payment_amount == 130,
-                    completed: true
-                }, { onConflict: 'enrollmentid' })
+                    completed: false
+                })
                 .select();
 
             if (enrollmentError) throw enrollmentError;
 
             toast.success(`${studentData[0].firstname} is ingeschreven!`)
         } catch (error: any) {
+            console.log(error)
             toast.error('Oeps, er ging iets mis bij het inschrijven!')
         } finally {
             setLoading(false)
@@ -190,15 +206,14 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
     };
 
     useEffect(() => {
-        if (enrollment) {
+        if (enrollment && type == 'enroll') {
             if (!enrollment.payment_complete) {
-                setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('payment')
                 handleOpen()
             }
             else if (enrollment.student_duplicate.repeating_year === true && enrollment.passed === false) {
-                console.log(enrollment)
-                setSelectedStudent({ id: enrollment.enrollmentid, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('fail')
                 handleOpen()
             }
@@ -211,8 +226,21 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                 <CardHeader className='flex justify-between items-center'>
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-default-700'>
-                            <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                            &nbsp; {enrollment?.student_duplicate?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
+                            {!enrollment.completed ?
+                                (
+                                    <>
+                                        <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                                        &nbsp; {enrollment?.student_duplicate?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
+                                    </>
+                                )
+                                :
+                                (
+                                    <div className='flex items-center w-full justify-end'>
+                                        <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                        &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
+                                    </div>
+                                )
+                            }
                         </h2>
                     </div>
                 </CardHeader>
@@ -236,6 +264,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                         {genderIsSelected ? 'Meisje' : 'Jongen'}
                                                     </Chip>
                                                     <Switch
+                                                        isSelected={genderIsSelected}
                                                         onValueChange={setGenderIsSelected}
                                                         onChange={field.onChange}
                                                         size='md'
@@ -261,6 +290,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -289,6 +319,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -318,6 +349,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                     <FormControl>
                                                         <I18nProvider locale="nl-BE">
                                                             <DatePicker
+                                                                isDisabled={enrollment?.completed}
                                                                 isRequired
                                                                 value={field.value}
                                                                 onChange={field.onChange}
@@ -347,6 +379,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Select
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             defaultSelectedKeys={newLevel?.levelid ? [newLevel.levelid] : []}
                                                             {...field}
@@ -380,6 +413,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value.toString()}
                                                             onChange={(e) => field.onChange(parseInt(e.target.value))}
@@ -428,6 +462,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -456,6 +491,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             value={field.value}
                                                             onChange={field.onChange}
                                                             type="text"
@@ -484,6 +520,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Select
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             defaultSelectedKeys={enrollment?.class_duplicate?.class_type ? [enrollment.class_duplicate.class_type] : []}
                                                             {...field}
@@ -492,7 +529,6 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                             placeholder='Selecteer het klastype'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
-                                                            selectedKeys={valueClassType}
                                                             onSelectionChange={setValueClassType}
                                                             isInvalid={form.formState.errors.classtype !== undefined}
                                                             errorMessage={form.formState.errors.classtype?.message}
@@ -519,6 +555,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -550,6 +587,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             value={field.value}
                                                             onChange={field.onChange}
                                                             type="text"
@@ -580,6 +618,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Checkbox
+                                                            isDisabled={enrollment?.completed}
                                                             isSelected={aloneIsSelected}
                                                             onValueChange={setAloneIsSelected}
                                                             onChange={field.onChange}
@@ -604,6 +643,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -632,6 +672,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -660,6 +701,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -688,6 +730,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
+                                                            isDisabled={enrollment?.completed}
                                                             isRequired
                                                             value={field.value}
                                                             onChange={field.onChange}
@@ -717,6 +760,7 @@ const EnrollmentForm = ({ levels, enrollment, type }: EnrollmentFormProps) => {
                                                 <FormItem>
                                                     <FormControl>
                                                         <Textarea
+                                                            isDisabled={enrollment?.completed}
                                                             value={field.value}
                                                             onChange={field.onChange}
                                                             placeholder="Geef eventuele opmerkingen hier in"

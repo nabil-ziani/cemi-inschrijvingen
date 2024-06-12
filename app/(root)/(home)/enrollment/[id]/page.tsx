@@ -33,8 +33,26 @@ const EnrollmentPage = async ({ params: { id, type } }: { params: { id: string, 
         }
     }
 
+    const getNewEnrollment = async (studentid: string): Promise<EnrollmentWithStudentClass | null> => {
+        // ID will be null when student is new (no 2023-enrollment)
+        if (id === 'null') {
+            return null
+        } else {
+            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*, level_duplicate(*))`).eq('studentid', studentid)
+
+            if (error) throw new Error("Error fetching new enrollment" + error);
+
+            return data[1];
+        }
+    }
+
     const enrollment = await getCurrentEnrollment()
     const student = enrollment?.student_duplicate
+    let newEnrollment: EnrollmentWithStudentClass | null = null;
+
+    if (enrollment && enrollment.completed) {
+        newEnrollment = await getNewEnrollment(enrollment.studentid)
+    }
 
     return (
         <>
@@ -42,7 +60,7 @@ const EnrollmentPage = async ({ params: { id, type } }: { params: { id: string, 
                 <h1 className='text-3xl font-bold'>{student ? `${capitalize(`${student.firstname} ${student.lastname}`)}` : 'Nieuwe inschrijving'}</h1>
             </div>
             <Divider className="my-5" />
-            <EnrollmentForm levels={levels} enrollment={enrollment} type={type} />
+            <EnrollmentForm levels={levels} enrollment={enrollment} type={type} newEnrollment={newEnrollment} />
         </>
     )
 }
