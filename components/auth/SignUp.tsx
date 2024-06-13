@@ -97,7 +97,7 @@ export function SignUp({ error }: SignUpProps) {
                 </div>
 
                 <form onSubmit={handleSubmit(handleFormSubmit)} className="flex flex-col space-y-4 bg-gray-50 px-4 py-8 sm:px-16">
-                    <div>
+                    <div className='flex justify-center'>
                         <Input
                             id="email"
                             value={value}
@@ -114,7 +114,7 @@ export function SignUp({ error }: SignUpProps) {
                             }
                         />
                     </div>
-                    <div>
+                    <div className='flex justify-center'>
                         <Input
                             label="Wachtwoord"
                             variant="bordered"
@@ -135,7 +135,7 @@ export function SignUp({ error }: SignUpProps) {
                         />
                     </div>
 
-                    <div>
+                    <div className='flex justify-center'>
                         <Input
                             label="Bevestig wachtwoord"
                             variant="bordered"
@@ -155,7 +155,14 @@ export function SignUp({ error }: SignUpProps) {
                             className="max-w-xs"
                         />
                     </div>
-                    <SubmitButton text={loading ? 'Laden...' : 'Maak je account aan'} loading={loading} />
+
+                    <div className='flex justify-center'>
+                        <SubmitButton
+                            text={loading ? 'Laden...' : 'Maak je account aan'}
+                            loading={loading}
+                            className='max-w-xs w-full'
+                        />
+                    </div>
 
                     <p className="text-center text-sm text-gray-500">
                         {'Heb je al een account? '}
