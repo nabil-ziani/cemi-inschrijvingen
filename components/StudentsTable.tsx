@@ -146,7 +146,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                 <p className="text-bold text-sm capitalize text-default-400">{enrollment.class_duplicate?.naam}</p>
                             </>
                         ) : (
-                            <p className="text-bold text-sm capitalize">Nog geen klas toegewezen</p>
+                            <p className="text-bold text-sm text-default-400">Nog geen klas toegewezen</p>
                         )}
                     </div>
                 )
