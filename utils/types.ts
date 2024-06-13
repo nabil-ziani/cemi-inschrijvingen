@@ -12,6 +12,7 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 export interface Enrollment {
     classid: string | null
     completed: boolean
+    enrolled_by: string | null
     enrollmentid: string
     levelid: string | null
     passed: boolean | null
@@ -19,6 +20,7 @@ export interface Enrollment {
     payment_complete: boolean
     status: Database["public"]["Enums"]["enrollmentstatus"]
     studentid: string
+    type: Database["public"]["Enums"]["classtype"] | null
     year: number
 }
 
@@ -46,6 +48,7 @@ export interface Student {
     phone_2: string | null
     postalcode: string | null
     remarks: string
+    repeating_year: boolean | null
     street: string | null
     studentid: string
 }
@@ -60,8 +63,8 @@ export interface EnrollmentWithStudent extends Enrollment {
 }
 
 export interface EnrollmentWithStudentClass extends Enrollment {
-    student: Student | null
-    class: Class | null
+    student_duplicate: Student | null
+    class_duplicate: Class | null
 }
 
 // FORM VALIDATION

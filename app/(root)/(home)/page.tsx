@@ -8,13 +8,12 @@ export default async function Index() {
 
   // --- Page Protection ---
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    redirect('/sign-in')
-  }
+
+  if (!user) redirect('/sign-in')
 
   // --- Get Enrollments of 2023 ---
   const getEnrollments = async () => {
-    const { data } = await supabase.from('enrollment').select(`*, student(*)`).eq('year', '2023').eq('status', 'Heringeschreven');
+    const { data } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*)`).eq('year', '2023').eq('status', 'Heringeschreven');
 
     return data;
   }

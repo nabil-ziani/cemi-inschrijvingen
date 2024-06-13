@@ -3,18 +3,18 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react'
 import StudentsTable from './StudentsTable'
-import { EnrollmentWithStudent } from '@/utils/types'
+import { EnrollmentWithStudentClass } from '@/utils/types'
 import toast from 'react-hot-toast'
 import { createClient } from '@/utils/supabase/client'
 
 interface StudentsProps {
-    data: EnrollmentWithStudent[],
+    data: EnrollmentWithStudentClass[],
 }
 
 const Students = ({ data }: StudentsProps) => {
     const [selectedKeys, setSelectedKeys] = useState<any>(new Set(["2023"]));
     const [loading, setLoading] = useState(true)
-    const [students, setStudents] = useState<Array<EnrollmentWithStudent>>(data)
+    const [students, setStudents] = useState<Array<EnrollmentWithStudentClass>>(data)
 
     const supabase = createClient();
 
@@ -27,7 +27,7 @@ const Students = ({ data }: StudentsProps) => {
         try {
             const fetchData = async () => {
                 const getEnrollments = async (year: string) => {
-                    const { data } = await supabase.from('enrollment').select(`*, student(*)`).eq('year', year).eq('status', 'Heringeschreven');
+                    const { data } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*)`).eq('year', year).eq('status', 'Heringeschreven');
                     return data;
                 }
 

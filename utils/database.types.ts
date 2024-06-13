@@ -47,10 +47,49 @@ export type Database = {
           },
         ]
       }
+      class_duplicate: {
+        Row: {
+          class_time: Database["public"]["Enums"]["classtime"]
+          class_type: Database["public"]["Enums"]["classtype"]
+          classid: string
+          gender: Database["public"]["Enums"]["gender"]
+          levelid: string
+          naam: string
+          year: number
+        }
+        Insert: {
+          class_time: Database["public"]["Enums"]["classtime"]
+          class_type: Database["public"]["Enums"]["classtype"]
+          classid?: string
+          gender: Database["public"]["Enums"]["gender"]
+          levelid: string
+          naam: string
+          year?: number
+        }
+        Update: {
+          class_time?: Database["public"]["Enums"]["classtime"]
+          class_type?: Database["public"]["Enums"]["classtype"]
+          classid?: string
+          gender?: Database["public"]["Enums"]["gender"]
+          levelid?: string
+          naam?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_duplicate_levelid_fkey"
+            columns: ["levelid"]
+            isOneToOne: false
+            referencedRelation: "level_duplicate"
+            referencedColumns: ["levelid"]
+          },
+        ]
+      }
       enrollment: {
         Row: {
           classid: string | null
           completed: boolean
+          enrolled_by: string | null
           enrollmentid: string
           levelid: string | null
           passed: boolean | null
@@ -63,6 +102,7 @@ export type Database = {
         Insert: {
           classid?: string | null
           completed?: boolean
+          enrolled_by?: string | null
           enrollmentid?: string
           levelid?: string | null
           passed?: boolean | null
@@ -75,6 +115,7 @@ export type Database = {
         Update: {
           classid?: string | null
           completed?: boolean
+          enrolled_by?: string | null
           enrollmentid?: string
           levelid?: string | null
           passed?: boolean | null
@@ -108,7 +149,89 @@ export type Database = {
           },
         ]
       }
+      enrollment_duplicate: {
+        Row: {
+          classid: string | null
+          completed: boolean
+          enrolled_by: string | null
+          enrollmentid: string
+          levelid: string | null
+          passed: boolean | null
+          payment_amount: number
+          payment_complete: boolean
+          status: Database["public"]["Enums"]["enrollmentstatus"]
+          studentid: string
+          type: Database["public"]["Enums"]["classtype"] | null
+          year: number
+        }
+        Insert: {
+          classid?: string | null
+          completed?: boolean
+          enrolled_by?: string | null
+          enrollmentid?: string
+          levelid?: string | null
+          passed?: boolean | null
+          payment_amount?: number
+          payment_complete?: boolean
+          status?: Database["public"]["Enums"]["enrollmentstatus"]
+          studentid: string
+          type?: Database["public"]["Enums"]["classtype"] | null
+          year: number
+        }
+        Update: {
+          classid?: string | null
+          completed?: boolean
+          enrolled_by?: string | null
+          enrollmentid?: string
+          levelid?: string | null
+          passed?: boolean | null
+          payment_amount?: number
+          payment_complete?: boolean
+          status?: Database["public"]["Enums"]["enrollmentstatus"]
+          studentid?: string
+          type?: Database["public"]["Enums"]["classtype"] | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollment_duplicate_classid_fkey"
+            columns: ["classid"]
+            isOneToOne: false
+            referencedRelation: "class_duplicate"
+            referencedColumns: ["classid"]
+          },
+          {
+            foreignKeyName: "enrollment_duplicate_levelid_fkey"
+            columns: ["levelid"]
+            isOneToOne: false
+            referencedRelation: "level_duplicate"
+            referencedColumns: ["levelid"]
+          },
+          {
+            foreignKeyName: "enrollment_duplicate_studentid_fkey"
+            columns: ["studentid"]
+            isOneToOne: false
+            referencedRelation: "student_duplicate"
+            referencedColumns: ["studentid"]
+          },
+        ]
+      }
       level: {
+        Row: {
+          levelid: string
+          name: Database["public"]["Enums"]["leveltype"]
+        }
+        Insert: {
+          levelid?: string
+          name: Database["public"]["Enums"]["leveltype"]
+        }
+        Update: {
+          levelid?: string
+          name?: Database["public"]["Enums"]["leveltype"]
+        }
+        Relationships: []
+      }
+      level_duplicate: {
         Row: {
           levelid: string
           name: Database["public"]["Enums"]["leveltype"]
@@ -138,6 +261,7 @@ export type Database = {
           phone_2: string | null
           postalcode: string | null
           remarks: string
+          repeating_year: boolean | null
           street: string | null
           studentid: string
         }
@@ -155,6 +279,7 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
@@ -172,6 +297,64 @@ export type Database = {
           phone_2?: string | null
           postalcode?: string | null
           remarks?: string
+          repeating_year?: boolean | null
+          street?: string | null
+          studentid?: string
+        }
+        Relationships: []
+      }
+      student_duplicate: {
+        Row: {
+          birthdate: string | null
+          city: string | null
+          email_1: string
+          email_2: string | null
+          firstname: string
+          gender: Database["public"]["Enums"]["gender"]
+          homeAlone: boolean
+          housenumber: string | null
+          lastname: string
+          phone_1: string
+          phone_2: string | null
+          postalcode: string | null
+          remarks: string
+          repeating_year: boolean | null
+          street: string | null
+          studentid: string
+        }
+        Insert: {
+          birthdate?: string | null
+          city?: string | null
+          email_1?: string
+          email_2?: string | null
+          firstname?: string
+          gender: Database["public"]["Enums"]["gender"]
+          homeAlone?: boolean
+          housenumber?: string | null
+          lastname?: string
+          phone_1?: string
+          phone_2?: string | null
+          postalcode?: string | null
+          remarks?: string
+          repeating_year?: boolean | null
+          street?: string | null
+          studentid?: string
+        }
+        Update: {
+          birthdate?: string | null
+          city?: string | null
+          email_1?: string
+          email_2?: string | null
+          firstname?: string
+          gender?: Database["public"]["Enums"]["gender"]
+          homeAlone?: boolean
+          housenumber?: string | null
+          lastname?: string
+          phone_1?: string
+          phone_2?: string | null
+          postalcode?: string | null
+          remarks?: string
+          repeating_year?: boolean | null
           street?: string | null
           studentid?: string
         }
