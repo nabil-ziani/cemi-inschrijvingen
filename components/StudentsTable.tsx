@@ -140,8 +140,14 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
             case "class_type":
                 return (
                     <div className="flex flex-col">
-                        <p className="text-bold text-sm capitalize">{enrollment.class_duplicate?.class_type}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{enrollment.class_duplicate?.naam}</p>
+                        {enrollment.classid ? (
+                            <>
+                                <p className="text-bold text-sm capitalize">{enrollment.class_duplicate?.class_type}</p>
+                                <p className="text-bold text-sm capitalize text-default-400">{enrollment.class_duplicate?.naam}</p>
+                            </>
+                        ) : (
+                            <p className="text-bold text-sm capitalize">Nog geen klas toegewezen</p>
+                        )}
                     </div>
                 )
             case "actions":

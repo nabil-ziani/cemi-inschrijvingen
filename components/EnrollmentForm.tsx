@@ -22,6 +22,7 @@ import { parsePhoneNumber } from 'libphonenumber-js'
 import { z } from "zod"
 import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
+import EnrollmentButton from './EnrollmentButton';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -141,6 +142,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             // If gender = true, send 'f' otherwise 'm'
             setLoading(true);
 
+            console.log(data)
             const { data: studentData, error: studentError } = await supabase
                 .from('student_duplicate')
                 .upsert({
@@ -168,7 +170,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 
             // --- Update 2023 enrollment, set completed to true ---
             // RLS does not enable new row create -> TO FIX!
-            const { data: enrollmentUpdateData, error: enrollmentUpdateError } = await supabase
+            const { error: enrollmentUpdateError } = await supabase
                 .from('enrollment_duplicate')
                 .upsert({
                     enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
@@ -181,7 +183,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             if (enrollmentUpdateError) throw enrollmentUpdateError;
 
             // --- Create NEW 2024 enrollment ---
-            const { data: enrollmentData, error: enrollmentError } = await supabase
+            const { error: enrollmentError } = await supabase
                 .from('enrollment_duplicate')
                 .insert({
                     studentid: studentId,
@@ -221,6 +223,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 handleOpen()
             }
         }
+
+        console.log(newEnrollment)
     }, [enrollment])
 
     return (
@@ -790,17 +794,11 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
                             {
-                                enrollment && (enrollment?.completed || !enrollment?.payment_complete || enrollment?.student_duplicate.repeating_year) ?
-                                    <Button variant='solid' isDisabled>
-                                        {
-                                            enrollment?.completed ? 'Reeds ingeschreven'
-                                                : !enrollment?.payment_complete ? 'Betaling onvoltooid'
-                                                    : enrollment?.student_duplicate.repeating_year ? 'Jaar herhaald en niet geslaagd'
-                                                        : ''
-                                        }
-                                    </Button>
-                                    :
-                                    <SubmitButton text={loading ? '' : 'Herinschrijven'} loading={loading} />
+                                type === 'enroll' ? (
+                                    <EnrollmentButton enrollment={enrollment} loading={loading} />
+                                ) : (
+                                    <Button color='primary' variant='solid'>Aanpassen</Button>
+                                )
                             }
                         </CardFooter>
                     </Card>

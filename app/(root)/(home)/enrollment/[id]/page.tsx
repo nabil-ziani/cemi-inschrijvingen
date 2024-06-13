@@ -38,11 +38,11 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*, level_duplicate(*))`).eq('studentid', studentid)
+            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*, level_duplicate(*))`).eq('studentid', studentid).eq('year', 2024).single()
 
             if (error) throw new Error("Error fetching new enrollment" + error);
 
-            return data[1];
+            return data;
         }
     }
 
