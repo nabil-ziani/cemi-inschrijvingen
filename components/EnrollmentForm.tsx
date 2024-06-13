@@ -530,7 +530,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                         <Select
                                                             isDisabled={enrollment?.completed}
                                                             isRequired
-                                                            defaultSelectedKeys={enrollment?.class_duplicate?.class_type ? [enrollment.class_duplicate.class_type] : []}
+                                                            defaultSelectedKeys={enrollment?.type ? [enrollment.type] : []}
                                                             {...field}
                                                             label='Type klas'
                                                             labelPlacement='outside'

@@ -31,7 +31,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         direction: "ascending",
     });
     const [page, setPage] = useState(1);
-    const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
+    const [selectedStudent, setSelectedStudent] = useState<{ id: string, type?: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -170,7 +170,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                 <Tooltip content="Herinschrijven">
                                     <span onClick={() => {
                                         if (enrollment.passed == null) {
-                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                                             setModalType('enroll')
                                             handleOpen()
                                         } else {
@@ -183,7 +183,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
                                 setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">

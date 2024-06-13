@@ -12,7 +12,7 @@ import { ClassTypeEnum } from '@/utils/types';
 interface DeleteEnrollmentModalProps {
     isOpen: boolean,
     onClose: () => void,
-    enrollment?: { id: string, type: string, student: { id: string, name: string, payment_amount: number } }
+    enrollment?: { id: string, type?: string, student: { id: string, name: string, payment_amount: number } }
     type: 'delete' | 'enroll' | 'payment' | 'fail'
 }
 
