@@ -221,7 +221,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 handleOpen()
             }
         }
-        console.log(type)
     }, [enrollment])
 
     return (
@@ -231,15 +230,14 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     <CardHeader className='flex justify-between items-center'>
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <div className='flex items-center w-full justify-end'>
-                                    <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
-                                    &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
-                                </div>
+                                <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                                &nbsp; {enrollment.student_duplicate?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                             </h2>
                         </div>
                     </CardHeader>
                 </Card>
             }
+
             {enrollment && type == 'view' &&
                 <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
                     <CardHeader className='flex justify-between items-center'>
@@ -254,6 +252,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     </CardHeader>
                 </Card>
             }
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <Card className='my-5 py-5 px-5 xl:max-w-[1800px]'>

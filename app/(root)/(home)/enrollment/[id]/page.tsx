@@ -57,7 +57,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     return (
         <>
             <div className="flex justify-between items-center">
-                <h1 className='text-3xl font-bold'>{student ? `${capitalize(`${student.firstname} ${student.lastname}`)}` : 'Nieuwe inschrijving'}</h1>
+                <h1 className='text-3xl font-bold'>{student ? `Herinschrijving - ${capitalize(`${student.firstname} ${student.lastname}`)}` : 'Nieuwe inschrijving'}</h1>
             </div>
             <Divider className="my-5" />
             <EnrollmentForm levels={levels} enrollment={enrollment} newEnrollment={newEnrollment} />
