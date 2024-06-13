@@ -161,6 +161,7 @@ export type Database = {
           payment_complete: boolean
           status: Database["public"]["Enums"]["enrollmentstatus"]
           studentid: string
+          type: Database["public"]["Enums"]["classtype"] | null
           year: number
         }
         Insert: {
@@ -174,6 +175,7 @@ export type Database = {
           payment_complete?: boolean
           status?: Database["public"]["Enums"]["enrollmentstatus"]
           studentid: string
+          type?: Database["public"]["Enums"]["classtype"] | null
           year: number
         }
         Update: {
@@ -187,6 +189,7 @@ export type Database = {
           payment_complete?: boolean
           status?: Database["public"]["Enums"]["enrollmentstatus"]
           studentid?: string
+          type?: Database["public"]["Enums"]["classtype"] | null
           year?: number
         }
         Relationships: [

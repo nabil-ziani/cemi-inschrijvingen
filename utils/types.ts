@@ -20,6 +20,7 @@ export interface Enrollment {
     payment_complete: boolean
     status: Database["public"]["Enums"]["enrollmentstatus"]
     studentid: string
+    type: Database["public"]["Enums"]["classtype"] | null
     year: number
 }
 

@@ -14,7 +14,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { createClient } from '@/utils/supabase/client';
-import { SubmitButton } from './SubmitButton';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
@@ -23,11 +22,11 @@ import { z } from "zod"
 import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
 import EnrollmentButton from './EnrollmentButton';
+import { Database } from '@/utils/database.types';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
     enrollment: EnrollmentWithStudentClass | null,
-    // type: 'enroll' | 'update' | 'view',
     newEnrollment?: EnrollmentWithStudentClass | null
 }
 
@@ -130,7 +129,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             city: enrollment && capitalize(enrollment.student_duplicate?.city) || '',
             remarks: enrollment && enrollment.student_duplicate?.remarks || '',
             level: enrollment && newLevel?.levelid || '',
-            classtype: enrollment && enrollment.class_duplicate?.class_type || '',
+            classtype: enrollment && enrollment.type || '',
             payment_amount: type == 'update' ? enrollment?.payment_amount : 0
         }
     });
@@ -142,7 +141,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             // If gender = true, send 'f' otherwise 'm'
             setLoading(true);
 
-            console.log(data)
             const { data: studentData, error: studentError } = await supabase
                 .from('student_duplicate')
                 .upsert({
@@ -169,7 +167,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             const studentId = studentData[0].studentid;
 
             // --- Update 2023 enrollment, set completed to true ---
-            // RLS does not enable new row create -> TO FIX!
             const { error: enrollmentUpdateError } = await supabase
                 .from('enrollment_duplicate')
                 .upsert({
@@ -194,7 +191,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     status: EnrollmentStatusEnum.Enum.Heringeschreven,
                     levelid: data.level,
                     payment_complete: data.classtype == ClassTypeEnum.Enum.Weekend ? data.payment_amount == 240 : data.payment_amount == 130,
-                    completed: false
+                    completed: false,
+                    type: data.classtype as Database["public"]["Enums"]["classtype"]
                 })
                 .select();
 
@@ -223,8 +221,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 handleOpen()
             }
         }
-
-        console.log(newEnrollment)
     }, [enrollment])
 
     return (
