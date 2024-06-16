@@ -83,11 +83,11 @@ const formSchema = z.object({
 });
 
 const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormProps) => {
-    const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student_duplicate?.homeAlone || false);
-    const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student_duplicate?.gender == 'f' ? true : false || false);
+    const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
+    const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
-    const [valueClassType, setValueClassType] = useState<any>(new Set([enrollment?.class_duplicate?.class_type]))
+    const [valueClassType, setValueClassType] = useState<any>(new Set([enrollment?.class?.class_type]))
     const [loading, setLoading] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -114,20 +114,20 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
         resolver: zodResolver(formSchema),
         mode: 'onBlur',
         defaultValues: {
-            firstname: enrollment && capitalize(enrollment.student_duplicate?.firstname) || '',
-            lastname: enrollment && capitalize(enrollment.student_duplicate?.lastname) || '',
-            birthdate: enrollment?.student_duplicate?.birthdate && parseDate(enrollment?.student_duplicate?.birthdate) || new CalendarDate(2000, 1, 1),
-            gender: enrollment && enrollment.student_duplicate?.gender == 'f' ? true : false || false,
-            phone_1: enrollment && enrollment.student_duplicate?.phone_1 || '',
-            phone_2: enrollment && enrollment.student_duplicate?.phone_2 || '',
-            email_1: enrollment && enrollment.student_duplicate?.email_1 || '',
-            email_2: enrollment && enrollment.student_duplicate?.email_2 || '',
-            homeAlone: enrollment && enrollment.student_duplicate?.homeAlone || false,
-            street: enrollment && capitalize(enrollment.student_duplicate?.street) || '',
-            housenumber: enrollment && enrollment.student_duplicate?.housenumber || '',
-            postalcode: enrollment && enrollment.student_duplicate?.postalcode || '',
-            city: enrollment && capitalize(enrollment.student_duplicate?.city) || '',
-            remarks: enrollment && enrollment.student_duplicate?.remarks || '',
+            firstname: enrollment && capitalize(enrollment.student?.firstname) || '',
+            lastname: enrollment && capitalize(enrollment.student?.lastname) || '',
+            birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || new CalendarDate(2000, 1, 1),
+            gender: enrollment && enrollment.student?.gender == 'f' ? true : false || false,
+            phone_1: enrollment && enrollment.student?.phone_1 || '',
+            phone_2: enrollment && enrollment.student?.phone_2 || '',
+            email_1: enrollment && enrollment.student?.email_1 || '',
+            email_2: enrollment && enrollment.student?.email_2 || '',
+            homeAlone: enrollment && enrollment.student?.homeAlone || false,
+            street: enrollment && capitalize(enrollment.student?.street) || '',
+            housenumber: enrollment && enrollment.student?.housenumber || '',
+            postalcode: enrollment && enrollment.student?.postalcode || '',
+            city: enrollment && capitalize(enrollment.student?.city) || '',
+            remarks: enrollment && enrollment.student?.remarks || '',
             level: enrollment && newLevel?.levelid || '',
             classtype: enrollment && enrollment.type || '',
             payment_amount: type == 'update' ? enrollment?.payment_amount : 0
@@ -142,7 +142,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             setLoading(true);
 
             const { data: studentData, error: studentError } = await supabase
-                .from('student_duplicate')
+                .from('student')
                 .upsert({
                     studentid: enrollment ? enrollment.studentid : undefined,
                     firstname: data.firstname,
@@ -168,7 +168,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 
             // --- Update 2023 enrollment, set completed to true ---
             const { error: enrollmentUpdateError } = await supabase
-                .from('enrollment_duplicate')
+                .from('enrollment')
                 .upsert({
                     enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
                     studentid: studentId,
@@ -181,7 +181,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 
             // --- Create NEW 2024 enrollment ---
             const { error: enrollmentError } = await supabase
-                .from('enrollment_duplicate')
+                .from('enrollment')
                 .insert({
                     studentid: studentId,
                     classid: null,
@@ -211,12 +211,12 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
     useEffect(() => {
         if (enrollment && type == 'enroll') {
             if (!enrollment.payment_complete) {
-                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('payment')
                 handleOpen()
             }
-            else if (enrollment.student_duplicate.repeating_year === true && enrollment.passed === false) {
-                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class_duplicate?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+            else if (enrollment.student.repeating_year === true && enrollment.passed === false) {
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('fail')
                 handleOpen()
             }
@@ -230,8 +230,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     <CardHeader className='flex justify-between items-center'>
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                                &nbsp; {enrollment.student_duplicate?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
+                                <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                                &nbsp; {enrollment.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                             </h2>
                         </div>
                     </CardHeader>
@@ -244,7 +244,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
                                 <div className='flex items-center w-full justify-end'>
-                                    <span className='font-bold'>{capitalize(enrollment.student_duplicate!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                    <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span>&nbsp; is reeds heringeschreven.
                                     &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
                                 </div>
                             </h2>
@@ -630,7 +630,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                             isSelected={aloneIsSelected}
                                                             onValueChange={setAloneIsSelected}
                                                             onChange={field.onChange}
-                                                            checked={enrollment ? enrollment.student_duplicate!.homeAlone : false}
+                                                            checked={enrollment ? enrollment.student!.homeAlone : false}
                                                         >
                                                             Alleen naar huis?
                                                         </Checkbox>

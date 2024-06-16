@@ -56,7 +56,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
 
         if (hasSearchFilter) {
             filteredEnrollments = filteredEnrollments.filter((enrollment) => {
-                const { student_duplicate: student } = enrollment;
+                const { student: student } = enrollment;
                 const filterValueLowerCase = filterValue.toLowerCase();
 
                 return (
@@ -95,24 +95,6 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         });
     }, [sortDescriptor, items]);
 
-    // // --- Supabase Realtime Events ---
-    // useEffect(() => {
-    //     const handleInserts = (payload) => {
-    //         console.log(payload);
-    //         router.refresh();
-    //     }
-
-    //     const subscription = supabase
-    //         .channel('enrollment_duplicate')
-    //         .on('postgres_changes', { event: '*', schema: 'public', table: 'enrollment_duplicate' }, handleInserts)
-    //         .subscribe();
-
-    //     // Cleanup function to unsubscribe
-    //     return () => {
-    //         subscription.unsubscribe();
-    //     }
-    // }, []); // Empty dependency array ensures this runs only once
-
     const renderCell = useCallback((enrollment: EnrollmentWithStudentClass, columnKey: React.Key) => {
         const cellValue = enrollment[columnKey as keyof EnrollmentWithStudentClass];
 
@@ -120,8 +102,8 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
             case "firstname":
                 return (
                     <User
-                        description={enrollment.student_duplicate?.email_1}
-                        name={`${enrollment.student_duplicate?.firstname ? capitalize(enrollment.student_duplicate?.firstname) : ''} ${enrollment.student_duplicate?.lastname ? capitalize(enrollment.student_duplicate?.lastname) : ''}`}
+                        description={enrollment.student?.email_1}
+                        name={`${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}`}
                     >
                     </User>
                 );
@@ -142,8 +124,8 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                     <div className="flex flex-col">
                         {enrollment.classid ? (
                             <>
-                                <p className="text-bold text-sm capitalize">{enrollment.class_duplicate?.class_type}</p>
-                                <p className="text-bold text-sm capitalize text-default-400">{enrollment.class_duplicate?.naam}</p>
+                                <p className="text-bold text-sm capitalize">{enrollment.class?.class_type}</p>
+                                <p className="text-bold text-sm capitalize text-default-400">{enrollment.class?.naam}</p>
                             </>
                         ) : (
                             <p className="text-bold text-sm text-default-400">Nog geen klas toegewezen</p>
@@ -170,7 +152,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                 <Tooltip content="Herinschrijven">
                                     <span onClick={() => {
                                         if (enrollment.passed == null) {
-                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                                             setModalType('enroll')
                                             handleOpen()
                                         } else {
@@ -183,7 +165,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
-                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student_duplicate.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                                 setModalType('delete')
                                 handleOpen()
                             }} className="text-lg text-danger cursor-pointer active:opacity-50">

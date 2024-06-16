@@ -63,8 +63,8 @@ export interface EnrollmentWithStudent extends Enrollment {
 }
 
 export interface EnrollmentWithStudentClass extends Enrollment {
-    student_duplicate: Student | null
-    class_duplicate: Class | null
+    student: Student | null
+    class: Class | null
 }
 
 // FORM VALIDATION
