@@ -6,9 +6,10 @@ interface SubmitButtonProps {
     text: string
     loading: boolean
     onClick?: () => void,
+    className?: string
 }
 
-export function SubmitButton({ text, loading, onClick }: SubmitButtonProps) {
+export function SubmitButton({ text, loading, onClick, className, ...props }: SubmitButtonProps) {
     return (
         <>
             {loading ?
@@ -41,7 +42,7 @@ export function SubmitButton({ text, loading, onClick }: SubmitButtonProps) {
                     {text}
                 </Button>
                 :
-                <Button color="primary" type="submit" onClick={onClick}>
+                <Button {...props} color="primary" type="submit" onClick={onClick} className={className}>
                     {text}
                 </Button>
             }

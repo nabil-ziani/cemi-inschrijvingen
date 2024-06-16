@@ -14,7 +14,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     if (!user) return redirect("/sign-in");
 
     // --- Get levels to prefill select with options ---
-    const { data: levels, error: levelsError } = await supabase.from('level_duplicate').select()
+    const { data: levels, error: levelsError } = await supabase.from('level').select()
 
     if (levelsError) throw new Error("Error fetching levels" + levelsError);
 
@@ -25,7 +25,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error: enrollmentError } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*, level_duplicate(*))`).eq('enrollmentid', id).single()
+            const { data, error: enrollmentError } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
 
             if (enrollmentError) throw new Error("Error fetching enrollments" + enrollmentError);
 
@@ -38,7 +38,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment_duplicate').select(`*, student_duplicate(*), class_duplicate(*, level_duplicate(*))`).eq('studentid', studentid).eq('year', 2024).single()
+            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('studentid', studentid).eq('year', 2024).single()
 
             if (error) throw new Error("Error fetching new enrollment" + error);
 
@@ -47,7 +47,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     }
 
     const enrollment = await getCurrentEnrollment()
-    const student = enrollment?.student_duplicate
+    const student = enrollment?.student
     let newEnrollment: EnrollmentWithStudentClass | null = null;
 
     if (enrollment && enrollment.completed) {

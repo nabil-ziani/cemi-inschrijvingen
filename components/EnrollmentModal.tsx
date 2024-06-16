@@ -26,7 +26,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const enrollStudentOut = async () => {
         try {
-            const { data, error } = await supabase.from('enrollment_duplicate').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', enrollment.id).select()
+            const { data, error } = await supabase.from('enrollment').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', enrollment.id).select()
 
             if (error) throw error;
 
@@ -39,7 +39,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const updateSchoolResult = async () => {
         try {
-            const { error } = await supabase.from('enrollment_duplicate').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
+            const { error } = await supabase.from('enrollment').update({ passed: passedIsSelected }).eq('enrollmentid', enrollment.id).select()
 
             if (error) throw error;
 
@@ -52,7 +52,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const updatePayment = async () => {
         try {
-            const { error } = await supabase.from('enrollment_duplicate').update({
+            const { error } = await supabase.from('enrollment').update({
                 payment_complete: true,
                 payment_amount: enrollment.type == ClassTypeEnum.Enum.Weekend ? 220 : 110
             }).eq('enrollmentid', enrollment.id).select()
@@ -69,7 +69,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const allowEnrollmentException = async () => {
         try {
-            const { data, error } = await supabase.from('student_duplicate').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
+            const { data, error } = await supabase.from('student').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
             console.log(data)
 
             if (error) throw error;

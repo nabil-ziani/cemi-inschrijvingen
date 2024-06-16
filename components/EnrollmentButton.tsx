@@ -17,7 +17,7 @@ const EnrollmentButton = ({ enrollment, loading }: EnrollmentButtonProps) => {
         return <Button variant='solid' isDisabled>Betaling onvoltooid</Button>;
     }
 
-    if (enrollment?.student_duplicate.repeating_year) {
+    if (enrollment?.student.repeating_year) {
         return <Button variant='solid' isDisabled>Jaar herhaald en niet geslaagd</Button>;
     }
 
