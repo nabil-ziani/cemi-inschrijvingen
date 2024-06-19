@@ -11,7 +11,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     // --- Auth protect page ---
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) return redirect("/sign-in");
+    if (!user) return redirect("/auth/sign-in");
 
     // --- Get levels to prefill select with options ---
     const { data: levels, error: levelsError } = await supabase.from('level').select()
