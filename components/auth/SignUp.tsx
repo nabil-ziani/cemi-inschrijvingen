@@ -13,7 +13,7 @@ import { Input } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from '../icons/MailIcon';
 import toast from 'react-hot-toast';
-import { signUp } from '@/app/(auth)/actions';
+import { signUp } from '@/app/auth/actions';
 
 interface SignUpProps {
     error: string

@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { signIn } from '@/app/(auth)/actions';
+import { signIn } from '@/app/auth/actions';
 import { createClient } from '@/utils/supabase/client';
 
 interface SignInProps {

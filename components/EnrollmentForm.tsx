@@ -230,7 +230,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     <CardHeader className='flex justify-between items-center'>
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                                <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
                                 &nbsp; {enrollment.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                             </h2>
                         </div>
@@ -244,7 +244,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
                                 <div className='flex items-center w-full justify-end'>
-                                    <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                    <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span>&nbsp; is reeds heringeschreven.
                                     &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
                                 </div>
                             </h2>
