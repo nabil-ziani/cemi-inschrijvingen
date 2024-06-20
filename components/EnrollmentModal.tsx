@@ -175,13 +175,16 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
                                     <Euro className="h-6 w-6 text-red-600" />
                                 </div>
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900">Betaling verwerken</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Betaling verwerken &nbsp;
+                                <span className="text-gray-600">- €{enrollment.type == ClassTypeEnum.Enum.Weekend ? 220 : 110}</span>
+                            </h3>
                             <p className="text-sm text-default-gray-500">
                                 De betaling van <span className="font-semibold">{enrollment?.student.name}</span> is nog niet voltooid.
                                 <br />
                                 <span className="font-bold text-default-gray-500 mt-2">
                                     {enrollment.student.payment_amount == 0 && `Er is geen voorschot betaald. (Volledig bedrag: ${enrollment.type == ClassTypeEnum.Enum.Weekend ? 220 : 110})`}
-                                    {enrollment.student.payment_amount > 0 && `Er is een voorschot betaald van €${enrollment.student.payment_amount}. (Volledig bedrag: ${enrollment.type == ClassTypeEnum.Enum.Weekend ? 220 : 110})`}
+                                    {enrollment.student.payment_amount > 0 && `Er is een voorschot betaald van €${enrollment.student.payment_amount}.`}
                                 </span>
                             </p>
                         </ModalBody>
