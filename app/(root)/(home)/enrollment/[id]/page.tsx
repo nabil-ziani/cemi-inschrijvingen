@@ -14,7 +14,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     if (!user) return redirect("/auth/sign-in");
 
     // --- Get levels to prefill select with options ---
-    const { data: levels, error: levelsError } = await supabase.from('level').select()
+    const { data: levels, error: levelsError } = await supabase.from('level').select().order('name', { ascending: true })
 
     if (levelsError) throw new Error("Error fetching levels" + levelsError);
 

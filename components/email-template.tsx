@@ -14,11 +14,11 @@ interface EmailTemplateProps {
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
     name, level, classtype, paymentAmount, street, housenumber, postalcode, city
 }) => (
-    <div style={{ minWidth: '100%', margin: '0px', padding: '0px', backgroundColor: '#242424' }}>
-        <div className="t64" style={{ backgroundColor: '#242424' }}>
+    <div style={{ minWidth: '100%', margin: '0px', padding: '0px', backgroundColor: '#F4F4F4' }}>
+        <div className="t64" style={{ backgroundColor: '#F4F4F4' }}>
             <table width="100%" cellPadding="0" cellSpacing="0" border={0} align="center">
                 <tr>
-                    <td className="t63" style={{ fontSize: 0, lineHeight: 0, backgroundColor: '#242424' }} valign="top" align="center">
+                    <td className="t63" style={{ fontSize: 0, lineHeight: 0, backgroundColor: '#F4F4F4' }} valign="top" align="center">
                         <table width="100%" cellPadding="0" cellSpacing="0" border={0} align="center" id="innerTable">
                             <tr>
                                 <td>
@@ -32,7 +32,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
 
                                     <table className="t53" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                         <tr>
-                                            <td className="t52" style={{ backgroundColor: '#F8F8F8', width: '420px', padding: '0 30px 40px 30px' }}>
+                                            <td className="t52" style={{ backgroundColor: '#fff', width: '420px', padding: '0 30px 40px 30px' }}>
                                                 <table width="100%" cellPadding="0" cellSpacing="0">
                                                     <tr>
                                                         <td>
@@ -43,10 +43,9 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t3" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginRight: 'auto' }}>
+                                                            <table className="t3" cellPadding="0" cellSpacing="0" style={{ marginRight: 'auto' }}>
                                                                 <tr>
-                                                                    <td className="t2" style={{ width: '80px', padding: '0 0 50px 0' }}>
+                                                                    <td className="t2" style={{ width: '88px', padding: '0 20px 40px 0' }}>
                                                                         <div style={{ fontSize: '0px' }}>
                                                                             <img className="t0"
                                                                                 style={{ display: 'block', border: 0, height: 'auto', width: '100%', margin: 0, maxWidth: '100%' }}
@@ -60,8 +59,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t6" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t6" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t5" style={{ width: '420px', padding: '0 0 20px 0' }}>
                                                                         <h1 className="t4" style={{ margin: 0, lineHeight: '28px', fontWeight: 800, fontStyle: 'normal', fontSize: '26px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-1.04px', direction: 'ltr', color: '#191919', textAlign: 'left' }}>
@@ -74,8 +72,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t9" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t9" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t8" style={{ width: '420px', padding: '0 0 22px 0' }}>
                                                                         <p className="t7" style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#333', textAlign: 'left' }}>
@@ -88,8 +85,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t13" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t13" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t12" style={{ width: '420px' }}>
                                                                         <p className="t11"
@@ -103,8 +99,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t16" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t16" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t15" style={{ width: '420px', padding: '0 0 22px 0' }}>
                                                                         <p className="t14"
@@ -118,8 +113,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t20" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t20" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t19" style={{ width: '420px' }}>
                                                                         <p className="t18"
@@ -133,8 +127,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t23" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t23" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t22" style={{ width: '420px', padding: '0 0 22px 0' }}>
                                                                         <p className="t21"
@@ -148,8 +141,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t27" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t27" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t26" style={{ width: '420px' }}>
                                                                         <p className="t25"
@@ -163,8 +155,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t30" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t30" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t29" style={{ width: '420px', padding: '0 0 22px 0' }}>
                                                                         <p className="t28"
@@ -178,8 +169,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t34" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t34" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t33" style={{ width: '420px' }}>
                                                                         <p className="t32"
@@ -193,8 +183,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t37" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t37" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t36" style={{ width: '420px' }}>
                                                                         <p className="t35"
@@ -208,8 +197,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t40" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t40" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t39" style={{ width: '420px' }}>
                                                                         <p className="t38"
@@ -223,15 +211,14 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <div className="t41"
-                                                                style={{ lineHeight: '30px', fontSize: '1px', display: 'block' }}>
-                                                                &nbsp;&nbsp;</div>
+                                                            <div className="t41" style={{ lineHeight: '30px', fontSize: '1px', display: 'block' }}>
+                                                                &nbsp;&nbsp;
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <table className="t50" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                            <table className="t50" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
                                                                 <tr>
                                                                     <td className="t49"
                                                                         style={{ backgroundColor: '#fee2e2', width: '380px', padding: '20px 20px 20px 20px' }}>
@@ -245,8 +232,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                                                         cellSpacing="0" className="t45">
                                                                                         <tr>
                                                                                             <td className="t44">
-                                                                                                <p className="t42"
-                                                                                                    style={{ margin: 0, fontFamily: 'Albert Sans', lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#DC2626', textAlign: 'left' }}>
+                                                                                                <p className="t42" style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#DC2626', textAlign: 'left' }}>
                                                                                                     Eventuele voorkeuren voor lestijden kunnen niet gegarandeerd worden!
                                                                                                 </p>
                                                                                             </td>
@@ -255,50 +241,6 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <table className="t62" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-                                        <tr>
-                                            <td className="t61"
-                                                style={{ backgroundColor: '#242424', width: '420px', padding: '40px 30px 40px, 30px' }}>
-                                                <table width="100%" cellPadding="0" cellSpacing="0">
-                                                    <tr>
-                                                        <td>
-                                                            <table className="t56" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-                                                                <tr>
-                                                                    <td className="t55" style={{ width: '420px' }}>
-                                                                        <p className="t54"
-                                                                            style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '12px', textDecoration: 'none', textTransform: 'none', direction: 'ltr', color: '#888', textAlign: 'center' }}>
-                                                                            Stenenbrug 75, 2140 Borgerhout</p>
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <table className="t60" cellPadding="0" cellSpacing="0"
-                                                                style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-                                                                <tr>
-                                                                    <td className="t59" style={{ width: '420px' }}>
-                                                                        <p className="t58"
-                                                                            style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '12px', textDecoration: 'none', textTransform: 'none', direction: 'ltr', color: '#888', textAlign: 'center' }}>
-                                                                            <a className="t57" href="https://tabular.email"
-                                                                                style={{ margin: 0, fontWeight: 700, fontStyle: 'normal', textDecoration: 'none', direction: 'ltr', color: '#888' }}
-                                                                                target="_blank">CEMI</a>&nbsp;
-                                                                        </p>
                                                                     </td>
                                                                 </tr>
                                                             </table>

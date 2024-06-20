@@ -9,6 +9,12 @@ interface EnrollmentButtonProps {
 }
 
 const EnrollmentButton = ({ enrollment, loading }: EnrollmentButtonProps) => {
+
+    // When navigating to enrollment page through sidebar, enrollment is null
+    if (!enrollment) {
+        return <SubmitButton text={loading ? '' : 'Inschrijven'} loading={loading} />;
+    }
+
     if (enrollment?.completed) {
         return <Button variant='solid' isDisabled>Reeds ingeschreven</Button>;
     }
