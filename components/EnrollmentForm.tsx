@@ -402,31 +402,32 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                     </div>
                                 </div>
 
-                                {/* Niveau - Betaling - Telefoon 1 - Telefoon 2 */}
+                                {/* Type Klas - Betaling - Telefoon 1 - Telefoon 2 */}
                                 <div className="sm:col-span-1">
                                     <div>
                                         <FormField
                                             control={form.control}
-                                            name='level'
+                                            name='classtype'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
                                                         <Select
                                                             isDisabled={enrollment?.completed}
                                                             isRequired
-                                                            defaultSelectedKeys={newLevel?.levelid ? [newLevel.levelid] : []}
+                                                            defaultSelectedKeys={enrollment?.type ? [enrollment.type] : []}
                                                             {...field}
-                                                            label='Niveau'
+                                                            label='Type klas'
                                                             labelPlacement='outside'
-                                                            placeholder='Selecteer het niveau'
+                                                            placeholder='Selecteer het klastype'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
-                                                            isInvalid={form.formState.errors.level !== undefined}
-                                                            errorMessage={form.formState.errors.level?.message}
+                                                            onSelectionChange={setValueClassType}
+                                                            isInvalid={form.formState.errors.classtype !== undefined}
+                                                            errorMessage={form.formState.errors.classtype?.message}
                                                         >
-                                                            {levels!.map((level) => (
-                                                                <SelectItem key={level.levelid}>
-                                                                    {level.name}
+                                                            {ClassTypeEnum.options.map((classType) => (
+                                                                <SelectItem key={classType} description={classType == ClassTypeEnum.Enum.Weekend ? '€240' : '€130'}>
+                                                                    {classType}
                                                                 </SelectItem>
                                                             ))}
                                                         </Select>
@@ -543,32 +544,31 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                     </div>
                                 </div>
 
-                                {/* Klastype - Email 1 - Email 2 - Alleen naar huis? */}
+                                {/* Niveau - Email 1 - Email 2 - Alleen naar huis? */}
                                 <div className="sm:col-span-1">
                                     <div>
                                         <FormField
                                             control={form.control}
-                                            name='classtype'
+                                            name='level'
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormControl>
                                                         <Select
                                                             isDisabled={enrollment?.completed}
                                                             isRequired
-                                                            defaultSelectedKeys={enrollment?.type ? [enrollment.type] : []}
+                                                            defaultSelectedKeys={newLevel?.levelid ? [newLevel.levelid] : []}
                                                             {...field}
-                                                            label='Type klas'
+                                                            label='Niveau'
                                                             labelPlacement='outside'
-                                                            placeholder='Selecteer het klastype'
+                                                            placeholder='Selecteer het niveau'
                                                             color='default'
                                                             className='text-sm font-medium leading-6'
-                                                            onSelectionChange={setValueClassType}
-                                                            isInvalid={form.formState.errors.classtype !== undefined}
-                                                            errorMessage={form.formState.errors.classtype?.message}
+                                                            isInvalid={form.formState.errors.level !== undefined}
+                                                            errorMessage={form.formState.errors.level?.message}
                                                         >
-                                                            {ClassTypeEnum.options.map((classType) => (
-                                                                <SelectItem key={classType} description={classType == ClassTypeEnum.Enum.Weekend ? '€240' : '€130'}>
-                                                                    {classType}
+                                                            {levels!.map((level) => (
+                                                                <SelectItem key={level.levelid}>
+                                                                    {level.name}
                                                                 </SelectItem>
                                                             ))}
                                                         </Select>
