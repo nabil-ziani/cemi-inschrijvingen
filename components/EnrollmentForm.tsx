@@ -112,7 +112,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        mode: 'onBlur',
+        mode: 'onSubmit',
         defaultValues: {
             firstname: enrollment && capitalize(enrollment.student?.firstname) || '',
             lastname: enrollment && capitalize(enrollment.student?.lastname) || '',
@@ -209,7 +209,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     name: `${data.firstname} ${data.lastname}`,
                     email_1: data.email_1,
                     email_2: data.email_2,
-                    level: data.level,
+                    level: levels.find(lvl => lvl.levelid == data.level).name,
                     paymentAmount: data.payment_amount,
                     classtype: data.classtype,
                     street: data.street,
