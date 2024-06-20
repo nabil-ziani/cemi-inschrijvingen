@@ -167,6 +167,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             const studentId = studentData[0].studentid;
 
             // --- Update 2023 enrollment, set completed to true ---
+            // Enrollments which are completed will not be editable 
             const { error: enrollmentUpdateError } = await supabase
                 .from('enrollment')
                 .upsert({
@@ -197,6 +198,30 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 .select();
 
             if (enrollmentError) throw enrollmentError;
+
+            // --- SEND EMAIL ---
+            const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: `${data.firstname} ${data.lastname}`,
+                    email_1: data.email_1,
+                    email_2: data.email_2,
+                    level: data.level,
+                    paymentAmount: data.payment_amount,
+                    classtype: data.classtype,
+                    street: data.street,
+                    housenumber: data.housenumber,
+                    postalcode: data.postalcode,
+                    city: data.city
+                }),
+            });
+
+            if (!response.ok) {
+                toast.error('Er ging iets mis bij het versturen van de mail!')
+            }
 
             toast.success(`${studentData[0].firstname} is ingeschreven!`)
         } catch (error: any) {
@@ -230,7 +255,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     <CardHeader className='flex justify-between items-center'>
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
+                                <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
                                 &nbsp; {enrollment.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
                             </h2>
                         </div>
@@ -244,7 +269,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                         <div className='flex items-center'>
                             <h2 className='mr-6 font-medium leading-none text-default-700'>
                                 <div className='flex items-center w-full justify-end'>
-                                    <span className='font-bold'>{capitalize(enrollment.student!.firstname)}</span>&nbsp; is reeds heringeschreven.
+                                    <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span>&nbsp; is reeds heringeschreven.
                                     &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
                                 </div>
                             </h2>

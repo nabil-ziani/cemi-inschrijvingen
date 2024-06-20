@@ -13,7 +13,7 @@ import { Input } from '@nextui-org/react';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from '../icons/MailIcon';
 import toast from 'react-hot-toast';
-import { signUp } from '@/app/(auth)/actions';
+import { signUp } from '@/app/auth/actions';
 
 interface SignUpProps {
     error: string
@@ -50,7 +50,7 @@ export function SignUp({ error }: SignUpProps) {
         if (error) {
             if (error == 'User already registered') {
                 toast.error('Er bestaat al een account voor het opgegeven mailadres');
-                router.push('/sign-in');
+                router.push('/auth/sign-in');
             } else {
                 toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
             }
@@ -65,7 +65,7 @@ export function SignUp({ error }: SignUpProps) {
             if (error) {
                 if (error == 'User already registered') {
                     toast.error('Er bestaat al een account voor het opgegeven mailadres');
-                    router.push('/sign-in');
+                    router.push('/auth/sign-in');
                 } else {
                     toast.error('Oeps, Er ging iets mis tijdens het aanmaken van je account');
                 }
@@ -166,7 +166,7 @@ export function SignUp({ error }: SignUpProps) {
 
                     <p className="text-center text-sm text-gray-500">
                         {'Heb je al een account? '}
-                        <Link href="/sign-in" className="font-semibold text-[#e18438]">
+                        <Link href="/auth/sign-in" className="font-semibold text-[#e18438]">
                             Login
                         </Link>
                         {''}

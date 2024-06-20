@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { signIn } from '@/app/(auth)/actions';
+import { signIn } from '@/app/auth/actions';
 import { createClient } from '@/utils/supabase/client';
 
 interface SignInProps {
@@ -138,14 +138,14 @@ export function SignIn({ error }: SignInProps) {
                         </p>
                     </div>
                     <SubmitButton text={loading ? 'Laden...' : 'Login'} loading={loading} />
-                    <Divider />
+                    {/* <Divider />
                     <Button onClick={handleGoogleLogin}>Login met Google</Button>
                     <p className="text-center text-sm text-gray-500">
                         {"Nog geen account? "}
                         <Link href="/sign-up" className="font-semibold text-[#e18438]">
                             Registreer je hier.
                         </Link>
-                    </p>
+                    </p> */}
                 </form>
             </div>
         </div >

@@ -14,7 +14,7 @@ export default async function Navbar() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-        return redirect("/sign-in");
+        return redirect("/auth/sign-in");
     }
 
     return (

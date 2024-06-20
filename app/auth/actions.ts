@@ -15,7 +15,7 @@ export const signIn: SubmitHandler<any> = async (formData) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-        redirect(`/sign-in?msg=${error.message}`)
+        redirect(`/auth/sign-in?msg=${error.message}`)
     }
 
     revalidatePath('/', 'layout')

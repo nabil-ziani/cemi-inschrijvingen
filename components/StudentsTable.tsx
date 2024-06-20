@@ -103,7 +103,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 return (
                     <User
                         description={enrollment.student?.email_1}
-                        name={`${enrollment.student?.firstname ? capitalize(enrollment.student?.firstname) : ''} ${enrollment.student?.lastname ? capitalize(enrollment.student?.lastname) : ''}`}
+                        name={`${capitalize(enrollment.student.firstname)} ${capitalize(enrollment.student?.lastname)}`}
                     >
                     </User>
                 );
@@ -240,7 +240,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                             >
                                 {statusOptions.map((status) => (
                                     <DropdownItem key={status.uid} className="capitalize">
-                                        {capitalize(status.name)}
+                                        {status.name}
                                     </DropdownItem>
                                 ))}
                             </DropdownMenu>
@@ -261,7 +261,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                             >
                                 {columns.map((column) => (
                                     <DropdownItem key={column.uid} className="capitalize">
-                                        {capitalize(column.name)}
+                                        {column.name}
                                     </DropdownItem>
                                 ))}
                             </DropdownMenu>
