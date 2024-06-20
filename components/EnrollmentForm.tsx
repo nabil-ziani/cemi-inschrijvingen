@@ -455,7 +455,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                             labelPlacement='outside'
                                                             placeholder='0.00'
                                                             description={
-                                                                field.value === 0
+                                                                !field.value
                                                                     ? ''
                                                                     : Array.from(valueClassType)[0] === ClassTypeEnum.Enum.Weekend
                                                                         ? (field.value === 240
