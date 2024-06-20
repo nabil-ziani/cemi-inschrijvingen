@@ -167,6 +167,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             const studentId = studentData[0].studentid;
 
             // --- Update 2023 enrollment, set completed to true ---
+            // Enrollments which are completed will not be editable 
             const { error: enrollmentUpdateError } = await supabase
                 .from('enrollment')
                 .upsert({
@@ -197,6 +198,29 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 .select();
 
             if (enrollmentError) throw enrollmentError;
+
+            // --- SEND EMAIL ---
+            const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: `${data.firstname} ${data.lastname}`,
+                    email_1: data.email_1,
+                    email_2: data.email_2,
+                    level: data.level,
+                    paymentAmount: data.payment_amount,
+                    street: data.street,
+                    housenumber: data.housenumber,
+                    postalcode: data.postalcode,
+                    city: data.city
+                }),
+            });
+
+            if (!response.ok) {
+                toast.error('Er ging iets mis bij het versturen van de mail!')
+            }
 
             toast.success(`${studentData[0].firstname} is ingeschreven!`)
         } catch (error: any) {
