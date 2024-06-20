@@ -211,6 +211,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     email_2: data.email_2,
                     level: data.level,
                     paymentAmount: data.payment_amount,
+                    classtype: data.classtype,
                     street: data.street,
                     housenumber: data.housenumber,
                     postalcode: data.postalcode,

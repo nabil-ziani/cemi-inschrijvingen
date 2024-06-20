@@ -5,14 +5,25 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
     try {
-        const { firstName, email, paymentAmount } = await req.json();
+        const {
+            name,
+            email_1,
+            email_2,
+            level,
+            classtype,
+            paymentAmount,
+            street,
+            housenumber,
+            postalcode,
+            city
+        } = await req.json();
 
         const { data, error } = await resend.emails.send({
             from: 'CEMI <kids@cemi-antwerp.be>',
-            to: [email],
-            cc: [],
+            to: [email_1],
+            cc: [email_2],
             subject: 'Bevestiging van je inschrijving',
-            react: EmailTemplate({ firstName, paymentAmount }),
+            react: EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city }),
         });
 
         if (error) {
