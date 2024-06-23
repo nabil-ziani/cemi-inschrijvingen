@@ -231,6 +231,7 @@ export type Database = {
         | "Niveau 3 - deel 2"
         | "Niveau 4 - deel 1"
         | "Niveau 4 - deel 2"
+        | "Niveau 5"
       newenrollmentstatus:
         | "Ingeschreven"
         | "Uitgeschreven"

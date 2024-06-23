@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure, Link } from '@nextui-org/react'
+import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -23,6 +23,7 @@ import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
 import EnrollmentButton from './EnrollmentButton';
 import { Database } from '@/utils/database.types';
+import EnrollmentNotice from './EnrollmentNotice';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -87,7 +88,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
     const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
     const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
     const [modalType, setModalType] = useState<'delete' | 'enroll' | 'payment' | 'fail'>('enroll')
-    const [valueClassType, setValueClassType] = useState<any>(new Set([enrollment?.class?.class_type]))
+    const [valueClassType, setValueClassType] = useState<any>(new Set([enrollment?.type]))
     const [loading, setLoading] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -237,12 +238,12 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
     useEffect(() => {
         if (enrollment && type == 'enroll') {
             if (!enrollment.payment_complete) {
-                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('payment')
                 handleOpen()
             }
             else if (enrollment.student.repeating_year === true && enrollment.passed === false) {
-                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.class?.class_type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
+                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('fail')
                 handleOpen()
             }
@@ -251,33 +252,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 
     return (
         <>
-            {(enrollment && type === 'enroll') &&
-                <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
-                    <CardHeader className='flex justify-between items-center'>
-                        <div className='flex items-center'>
-                            <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span> zal worden ingeschreven in <span className='font-bold'>{newLevel?.name}</span>,
-                                &nbsp; {enrollment.student?.gender == 'f' ? 'Ze' : 'Hij'} zat dit schooljaar in {currentLevel!.name} en is <span className={`${enrollment.passed ? 'text-green-800' : 'text-red-800'}`}>{enrollment.passed ? 'geslaagd' : 'niet geslaagd'}</span>
-                            </h2>
-                        </div>
-                    </CardHeader>
-                </Card>
-            }
-
-            {enrollment && type == 'view' &&
-                <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
-                    <CardHeader className='flex justify-between items-center'>
-                        <div className='flex items-center'>
-                            <h2 className='mr-6 font-medium leading-none text-default-700'>
-                                <div className='flex items-center w-full justify-end'>
-                                    <span className='font-bold'>{capitalize(enrollment.student.firstname)}</span>&nbsp; is reeds heringeschreven.
-                                    &nbsp; <Link href={`/enrollment/${newEnrollment?.enrollmentid}?type=update`} underline="always">Bekijk de nieuwe inschrijving</Link>&nbsp; om aanpassingen te maken.
-                                </div>
-                            </h2>
-                        </div>
-                    </CardHeader>
-                </Card>
-            }
+            <EnrollmentNotice enrollment={enrollment} newEnrollment={newEnrollment} type={type} currentLevel={currentLevel} newLevel={newLevel} />
 
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -815,17 +790,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                             </div>
                         </CardBody>
                         <CardFooter className='flex justify-end items-center'>
-                            {
-                                type === 'enroll' ? (
-                                    <EnrollmentButton enrollment={enrollment} loading={loading} />
-                                ) :
-                                    type === 'update' ? (
-                                        <Button type='submit' color='primary' variant='solid'>Aanpassen</Button>
-                                    ) :
-                                        (
-                                            <Button type='submit' color='primary' variant='solid'>Inschrijven</Button>
-                                        )
-                            }
+                            <EnrollmentButton enrollment={enrollment} loading={loading} type={type} />
                         </CardFooter>
                     </Card>
                 </form>
