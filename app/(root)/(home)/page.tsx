@@ -13,7 +13,7 @@ export default async function Index() {
 
   // --- Get Enrollments of 2023 ---
   const getEnrollments = async () => {
-    const { data } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', '2023').eq('status', 'Heringeschreven');
+    const { data } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', '2023');
 
     return data;
   }

@@ -174,6 +174,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
                     studentid: studentId,
                     year: 2023,
+                    status: EnrollmentStatusEnum.Enum.Ingeschreven,
                     completed: true
                 }, { onConflict: 'enrollmentid' })
                 .select();
@@ -189,7 +190,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     year: 2024,
                     passed: null,
                     payment_amount: data.payment_amount,
-                    status: EnrollmentStatusEnum.Enum.Heringeschreven,
+                    status: EnrollmentStatusEnum.Enum.Ingeschreven,
                     levelid: data.level,
                     payment_complete: data.classtype == ClassTypeEnum.Enum.Weekend ? data.payment_amount == 240 : data.payment_amount == 130,
                     completed: false,
@@ -817,9 +818,13 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                             {
                                 type === 'enroll' ? (
                                     <EnrollmentButton enrollment={enrollment} loading={loading} />
-                                ) : (
-                                    <Button color='primary' variant='solid'>Aanpassen</Button>
-                                )
+                                ) :
+                                    type === 'update' ? (
+                                        <Button type='submit' color='primary' variant='solid'>Aanpassen</Button>
+                                    ) :
+                                        (
+                                            <Button type='submit' color='primary' variant='solid'>Inschrijven</Button>
+                                        )
                             }
                         </CardFooter>
                     </Card>

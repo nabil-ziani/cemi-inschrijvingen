@@ -7,14 +7,13 @@ import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
 import { capitalize } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { Edit3, EditIcon, UserCheck, UserX } from "lucide-react";
-import { Enrollment, EnrollmentWithStudentClass } from "@/utils/types";
+import { Edit3, UserCheck, UserX } from "lucide-react";
+import { Enrollment, EnrollmentStatusEnum, EnrollmentWithStudentClass } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
 import { EyeIcon } from "./icons/EyeIcon";
 
-const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "passed", "payment_complete", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "payment_complete", "status", "actions"];
 
 interface StudentsProps {
     data: EnrollmentWithStudentClass[],
@@ -24,7 +23,7 @@ interface StudentsProps {
 export default function StudentsTable({ data, loading }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState<Selection>("all");
+    const [statusFilter, setStatusFilter] = useState<Selection>(new Set(["Niet heringeschreven", "Ingeschreven", "Onder voorbehoud"]));
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "firstname",
@@ -36,7 +35,6 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const router = useRouter()
-    const supabase = createClient()
 
     // MODAL
     const handleOpen = () => {
@@ -67,11 +65,11 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
             });
         }
 
-        // if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-        //     filteredEnrollments = filteredEnrollments.filter((enrollment) =>
-        //         Array.from(statusFilter).includes(enrollment.status),
-        //     );
-        // }
+        if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
+            filteredEnrollments = filteredEnrollments.filter((enrollment) => {
+                return Array.from(statusFilter).includes(enrollment.status)
+            })
+        }
 
         return filteredEnrollments;
     }, [data, filterValue, statusFilter]);
@@ -132,6 +130,12 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                         )}
                     </div>
                 )
+            case "status":
+                return (
+                    <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue == 'Ingeschreven' ? 'success' : cellValue == 'Onder voorbehoud' ? 'warning' : cellValue == 'Niet heringeschreven' ? 'default' : 'danger'}>
+                        {cellValue.toString()}
+                    </Chip>
+                );
             case "actions":
                 return (
                     <div className="relative flex items-center gap-3">
@@ -149,19 +153,26 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                                     </span>
                                 </Tooltip>
                                 :
-                                <Tooltip content="Herinschrijven">
-                                    <span onClick={() => {
-                                        if (enrollment.passed == null) {
-                                            setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
-                                            setModalType('enroll')
-                                            handleOpen()
-                                        } else {
-                                            router.push(`/enrollment/${enrollment.enrollmentid}?type=enroll`)
-                                        }
-                                    }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                        <UserCheck strokeWidth={1} />
-                                    </span>
-                                </Tooltip>
+                                enrollment.status == EnrollmentStatusEnum.Enum["Onder voorbehoud"] ?
+                                    <Tooltip content="Inschrijven">
+                                        <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=new`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                            <UserCheck strokeWidth={1} />
+                                        </span>
+                                    </Tooltip>
+                                    :
+                                    <Tooltip content="Herinschrijven">
+                                        <span onClick={() => {
+                                            if (enrollment.passed == null) {
+                                                setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
+                                                setModalType('enroll')
+                                                handleOpen()
+                                            } else {
+                                                router.push(`/enrollment/${enrollment.enrollmentid}?type=enroll`)
+                                            }
+                                        }} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                                            <UserCheck strokeWidth={1} />
+                                        </span>
+                                    </Tooltip>
                         }
                         <Tooltip color="danger" content="Uitschrijven">
                             <span onClick={() => {
@@ -325,7 +336,6 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                 topContent={topContent}
                 topContentPlacement="outside"
                 onSortChange={setSortDescriptor}
-            // disabledKeys={data.map((e) => e.completed ? e.studentid : '')}
             >
                 <TableHeader columns={headerColumns}>
                     {(column) => (

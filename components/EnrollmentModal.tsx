@@ -7,7 +7,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Check, Euro, X } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import { useRouter } from "next/navigation";
-import { ClassTypeEnum } from '@/utils/types';
+import { ClassTypeEnum, EnrollmentStatusEnum } from '@/utils/types';
 
 interface DeleteEnrollmentModalProps {
     isOpen: boolean,
@@ -26,7 +26,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const enrollStudentOut = async () => {
         try {
-            const { data, error } = await supabase.from('enrollment').update({ status: 'Niet ingeschreven' }).eq('enrollmentid', enrollment.id).select()
+            const { data, error } = await supabase.from('enrollment').update({ status: EnrollmentStatusEnum.Enum.Uitgeschreven }).eq('enrollmentid', enrollment.id).select()
 
             if (error) throw error;
 
