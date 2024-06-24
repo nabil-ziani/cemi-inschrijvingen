@@ -159,3 +159,28 @@ export const updateStudent = async (enrollment: EnrollmentWithStudentClass, data
 
     return enrollment.student
 }
+
+export const sendMail = async (type: string, data: any, level: string) => {
+    const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: `${data.firstname} ${data.lastname}`,
+            email_1: data.email_1,
+            email_2: data.email_2,
+            level: level,
+            paymentAmount: data.payment_amount,
+            classtype: data.classtype,
+            street: data.street,
+            housenumber: data.housenumber,
+            postalcode: data.postalcode,
+            city: data.city,
+            phone_1: data.phone_1,
+            phone_2: data.phone_2
+        }),
+    });
+
+    return response;
+}

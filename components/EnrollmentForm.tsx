@@ -22,7 +22,7 @@ import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
 import EnrollmentButton from './EnrollmentButton';
 import EnrollmentNotice from './EnrollmentNotice';
-import { enrollExistingStudent, enrollNewStudent, updateStudent } from '@/actions/enrollmentActions';
+import { enrollExistingStudent, enrollNewStudent, sendMail, updateStudent } from '@/actions/enrollmentActions';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -156,6 +156,15 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 setLoading(false)
             }
 
+            // --- SEND CONFIRMATION EMAIL ---
+            const response = await sendMail('enroll', data, levels.find(lvl => lvl.levelid == data.level).name)
+            if (!response.ok) {
+                toast.error('Er ging iets mis bij het versturen van de mail!')
+            } else {
+                toast.success('Een bevestigingsmail is verstuurd!')
+            }
+
+            // We will not send a mail when student is updated
             if (type === 'update') {
                 const student = await updateStudent(enrollment, data, genderIsSelected)
                 router.replace('/')
@@ -164,33 +173,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 toast.success(`${student.firstname} is aangepast!`)
                 setLoading(false)
             }
-
-            // --- SEND EMAIL ---
-            // TODO: add in mail the status (Onder Voorbehoud?)
-            // TODO: create method "sendEmail" which takes a type because differnt things should be sent depending on type
-            const response = await fetch('/api/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: `${data.firstname} ${data.lastname}`,
-                    email_1: data.email_1,
-                    email_2: data.email_2,
-                    level: levels.find(lvl => lvl.levelid == data.level).name,
-                    paymentAmount: data.payment_amount,
-                    classtype: data.classtype,
-                    street: data.street,
-                    housenumber: data.housenumber,
-                    postalcode: data.postalcode,
-                    city: data.city
-                }),
-            });
-
-            if (!response.ok) {
-                toast.error('Er ging iets mis bij het versturen van de mail!')
-            }
-
         } catch (error: any) {
             toast.error('Oeps, er ging iets mis bij het inschrijven!')
         }

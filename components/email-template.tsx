@@ -8,11 +8,13 @@ interface EmailTemplateProps {
     street: string,
     housenumber: string,
     postalcode: string,
-    city: string
+    city: string,
+    phone_1: string,
+    phone_2: string
 }
 
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
-    name, level, classtype, paymentAmount, street, housenumber, postalcode, city
+    name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2
 }) => (
     <div style={{ minWidth: '100%', margin: '0px', padding: '0px', backgroundColor: '#F4F4F4' }}>
         <div className="t64" style={{ backgroundColor: '#F4F4F4' }}>
@@ -161,6 +163,34 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                                                                         <p className="t28"
                                                                             style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#333', textAlign: 'left' }}>
                                                                             € {paymentAmount}
+                                                                        </p>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table className="t34" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                                <tr>
+                                                                    <td className="t33" style={{ width: '420px' }}>
+                                                                        <p className="t32"
+                                                                            style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#333', textAlign: 'left' }}>
+                                                                            <span className="t31" style={{ margin: 0, fontWeight: 'bold' }}>Telefoon</span>
+                                                                        </p>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <table className="t37" cellPadding="0" cellSpacing="0" style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+                                                                <tr>
+                                                                    <td className="t36" style={{ width: '420px' }}>
+                                                                        <p className="t35"
+                                                                            style={{ margin: 0, lineHeight: '22px', fontWeight: 500, fontStyle: 'normal', fontSize: '14px', textDecoration: 'none', textTransform: 'none', letterSpacing: '-0.56px', direction: 'ltr', color: '#333', textAlign: 'left' }}>
+                                                                            {phone_1} {phone_2 ? `& ${phone_2}` : ''}
                                                                         </p>
                                                                     </td>
                                                                 </tr>
