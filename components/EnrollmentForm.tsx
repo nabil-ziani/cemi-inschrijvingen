@@ -191,7 +191,9 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 setLoading(false)
             }
         } catch (error: any) {
+            console.log(error)
             toast.error('Oeps, er ging iets mis bij het inschrijven!')
+            setLoading(false)
         }
     };
 

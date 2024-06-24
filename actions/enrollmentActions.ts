@@ -66,13 +66,14 @@ export const enrollExistingStudent = async (enrollment: EnrollmentWithStudentCla
     return studentData[0]
 }
 
-export const enrollNewStudent = async (enrollment: EnrollmentWithStudentClass, data: any, genderIsSelected: boolean) => {
+export const enrollNewStudent = async (enrollment: EnrollmentWithStudentClass | undefined, data: any, genderIsSelected: boolean) => {
     const supabase = createClient();
 
     // Create new student
     const { data: studentData, error: studentError } = await supabase
         .from('student')
-        .insert({
+        .upsert({
+            studentid: enrollment?.studentid,
             firstname: data.firstname,
             lastname: data.lastname,
             gender: genderIsSelected ? 'f' : 'm',
@@ -93,7 +94,18 @@ export const enrollNewStudent = async (enrollment: EnrollmentWithStudentClass, d
 
     const studentId = studentData[0].studentid;
 
-    // There is no 2023 enrollment to update
+    // There can be a 2023 enrollment which we need to update
+    if (enrollment) {
+        const { error } = await supabase
+            .from('enrollment')
+            .update({
+                status: "Ingeschreven",
+                completed: true
+            }).eq('enrollmentid', enrollment.enrollmentid)
+            .select();
+
+        if (error) throw error;
+    }
 
     // --- Create NEW 2024 enrollment ---
     const { error: enrollmentError } = await supabase
