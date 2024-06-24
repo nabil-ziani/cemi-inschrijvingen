@@ -15,7 +15,9 @@ export async function POST(req: Request) {
             street,
             housenumber,
             postalcode,
-            city
+            city,
+            phone_1,
+            phone_2
         } = await req.json();
 
         const { data, error } = await resend.emails.send({
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
             to: [email_1],
             cc: [email_2],
             subject: 'Bevestiging van je inschrijving',
-            react: EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city }),
+            react: EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2 }),
         });
 
         if (error) {

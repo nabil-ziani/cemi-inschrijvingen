@@ -25,7 +25,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error: enrollmentError } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).single()
+            const { data, error: enrollmentError } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).limit(1).single()
 
             if (enrollmentError) throw new Error("Error fetching enrollments" + enrollmentError);
 
@@ -38,7 +38,7 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('studentid', studentid).eq('year', 2024).single()
+            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('studentid', studentid).eq('year', 2024).limit(1).single()
 
             if (error) throw new Error("Error fetching new enrollment" + error);
 
@@ -64,5 +64,4 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         </>
     )
 }
-
 export default EnrollmentPage

@@ -6,7 +6,7 @@ export const sidebarLinks = [
     },
     {
         label: 'Inschrijving',
-        route: '/enrollment/null?type=enroll',
+        route: '/enrollment/null?type=new',
         imgUrl: '/icons/members.svg',
     }
 ]
@@ -16,11 +16,13 @@ export const columns = [
     { name: "Type Klas", uid: "class_type", sortable: true },
     { name: "Betaling", uid: "payment_complete", sortable: true },
     { name: "Resultaat", uid: "passed", sortable: true },
+    { name: "Status - 2024", uid: "status", sortable: true },
     { name: "Acties", uid: "actions", sortable: false },
 ]
 
 export const statusOptions = [
-    { name: "Active", uid: "active" },
-    { name: "Paused", uid: "paused" },
-    { name: "Vacation", uid: "vacation" },
+    { name: "Niet heringeschreven", uid: "Niet heringeschreven" },
+    { name: "Ingeschreven", uid: "Ingeschreven" },
+    { name: "Onder voorbehoud", uid: "Onder voorbehoud" },
+    { name: "Uitgeschreven", uid: "Uitgeschreven" },
 ]

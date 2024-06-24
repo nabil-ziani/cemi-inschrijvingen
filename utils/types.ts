@@ -18,7 +18,7 @@ export interface Enrollment {
     passed: boolean | null
     payment_amount: number
     payment_complete: boolean
-    status: Database["public"]["Enums"]["enrollmentstatus"]
+    status: Database["public"]["Enums"]["newenrollmentstatus"]
     studentid: string
     type: Database["public"]["Enums"]["classtype"] | null
     year: number
@@ -69,7 +69,7 @@ export interface EnrollmentWithStudentClass extends Enrollment {
 
 // FORM VALIDATION
 
-export const EnrollmentStatusEnum = z.enum(["Heringeschreven", "Niet ingeschreven", "Onder voorbehoud"]);
+export const EnrollmentStatusEnum = z.enum(["Ingeschreven", "Niet ingeschreven", "Onder voorbehoud", "Uitgeschreven"]);
 export const ClassTimeEnum = z.enum(["VM", "MD", "NM"]);
 export const ClassTypeEnum = z.enum(["Woensdag", "Zondag", "Weekend"]);
 export const GenderEnum = z.enum(["m", "f"]);
