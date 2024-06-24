@@ -72,6 +72,19 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
         )
     }
 
+    if (enrollment.status == EnrollmentStatusEnum.Enum.Uitgeschreven) {
+        return (
+            <>
+                <Tooltip content="Inschrijven" isDisabled>
+                    <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=new`)} className="text-lg text-default-400 cursor-not-allowed opacity-40">
+                        <UserCheck strokeWidth={1} />
+                    </span>
+                </Tooltip>
+                <DeleteTooltip enrollment={enrollment} disabled={true} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
+            </>
+        )
+    }
+
     return (
         <>
             <Tooltip content="Herinschrijven">
