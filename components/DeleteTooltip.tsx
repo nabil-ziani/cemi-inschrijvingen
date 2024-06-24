@@ -32,6 +32,7 @@ const DeleteTooltip = ({ enrollment, setSelectedStudent, setModalType, onOpen, d
     return (
         <Tooltip color="danger" content="Uitschrijven" isDisabled={disabled}>
             <span onClick={() => {
+                if (disabled) return;
                 setSelectedStudent({ id: enrollment.enrollmentid, type: enrollment.type, student: { id: enrollment.studentid, name: `${capitalize(enrollment.student.firstname)}`, payment_amount: enrollment.payment_amount } })
                 setModalType('delete')
                 handleOpen()

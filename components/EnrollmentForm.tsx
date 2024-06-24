@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { ClassType, useEffect, useState } from 'react';
 import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, useDisclosure } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
@@ -193,20 +193,25 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
         }
     }, [enrollment])
 
-    function getPaymentDescription(value, classType) {
-        const fullAmount = enrollment?.year === 2023 ? 110 : 130;
+    function getPaymentDescription(value: number, classType: any) {
+        let fullAmount: number;
+
         if (!value) return '';
 
         if (classType === ClassTypeEnum.Enum.Weekend) {
-            if (value === 240) {
+            fullAmount = type == 'view' ? 220 : 240
+
+            if (value === fullAmount) {
                 return 'Volledig ✅';
-            } else if (value > 0 && value < 240) {
+            } else if (value > 0 && value < fullAmount) {
                 return 'Voorschot 👍';
             } else {
                 return 'Teveel ❌';
             }
         } else {
-            if (value === fullAmount) {
+            fullAmount = type == 'view' ? 110 : 130
+
+            if (value == fullAmount) {
                 return 'Volledig ✅';
             } else if (value > 0 && value < fullAmount) {
                 return 'Voorschot 👍';

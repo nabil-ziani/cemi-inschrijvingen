@@ -76,7 +76,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
         return (
             <>
                 <Tooltip content="Inschrijven" isDisabled>
-                    <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=new`)} className="text-lg text-default-400 cursor-not-allowed opacity-40">
+                    <span className="text-lg text-default-400 cursor-not-allowed opacity-40">
                         <UserCheck strokeWidth={1} />
                     </span>
                 </Tooltip>
