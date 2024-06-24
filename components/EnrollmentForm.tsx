@@ -132,7 +132,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             payment_amount: type === 'update' || type === 'view' ? enrollment?.payment_amount : 0
         }
     });
-    console.log(enrollment)
 
     // --- Make new enrollment for year 2024 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {

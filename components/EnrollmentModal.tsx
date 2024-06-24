@@ -69,8 +69,7 @@ const EnrollmentModal = ({ isOpen, onClose, enrollment, type }: DeleteEnrollment
 
     const allowEnrollmentException = async () => {
         try {
-            const { data, error } = await supabase.from('student').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
-            console.log(data)
+            const { error } = await supabase.from('student').update({ repeating_year: false }).eq('studentid', enrollment.student.id).select()
 
             if (error) throw error;
 
