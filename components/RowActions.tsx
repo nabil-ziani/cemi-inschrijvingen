@@ -62,9 +62,9 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
     if (enrollment.status == EnrollmentStatusEnum.Enum["Onder voorbehoud"]) {
         return (
             <>
-                <Tooltip content="Inschrijven">
-                    <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=new`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                        <UserCheck strokeWidth={1} />
+                <Tooltip content="Wijzigen">
+                    <span onClick={() => router.push(`/enrollment/${enrollment.enrollmentid}?type=ref`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                        <Edit3 strokeWidth={1} />
                     </span>
                 </Tooltip>
                 <DeleteTooltip enrollment={enrollment} disabled={true} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />

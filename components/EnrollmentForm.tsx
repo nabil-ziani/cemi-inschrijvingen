@@ -22,7 +22,7 @@ import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
 import EnrollmentButton from './EnrollmentButton';
 import EnrollmentNotice from './EnrollmentNotice';
-import { enrollExistingStudent, enrollNewStudent, sendMail, updateStudent } from '@/actions/enrollmentActions';
+import { enrollExistingStudent, enrollNewStudent, updateRefStudent, updateStudent } from '@/actions/enrollmentActions';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -149,7 +149,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             }
 
             if (type === 'new') {
-                const student = await enrollNewStudent(enrollment, data, genderIsSelected)
+                const student = await enrollNewStudent(data, genderIsSelected)
                 router.replace('/')
 
                 toast.success(`${student.firstname} is ingeschreven!`)
@@ -178,8 +178,10 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 }),
             });
 
-            if (!response.ok) toast.error('Er ging iets mis bij het versturen van de mail!')
-            else toast.success('Een bevestigingsmail is verstuurd!')
+            if (!response.ok)
+                toast.error('Er ging iets mis bij het versturen van de mail!')
+            else
+                toast.success('Een bevestigingsmail is verstuurd!')
 
             // We will not send a mail when student is updated
             if (type === 'update') {
@@ -190,6 +192,15 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 toast.success(`${student.firstname} is aangepast!`)
                 setLoading(false)
             }
+
+            if (type === 'ref') {
+                const student = await updateRefStudent(enrollment, data, genderIsSelected)
+                router.replace('/')
+
+                toast.success(`${student.firstname} is ingeschreven!`)
+                setLoading(false)
+            }
+
         } catch (error: any) {
             console.log(error)
             toast.error('Oeps, er ging iets mis bij het inschrijven!')
