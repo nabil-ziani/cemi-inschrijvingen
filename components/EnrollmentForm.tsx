@@ -157,12 +157,29 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             }
 
             // --- SEND CONFIRMATION EMAIL ---
-            const response = await sendMail('enroll', data, levels.find(lvl => lvl.levelid == data.level).name)
-            if (!response.ok) {
-                toast.error('Er ging iets mis bij het versturen van de mail!')
-            } else {
-                toast.success('Een bevestigingsmail is verstuurd!')
-            }
+            const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: `${data.firstname} ${data.lastname}`,
+                    email_1: data.email_1,
+                    email_2: data.email_2,
+                    level: levels.find(lvl => lvl.levelid == data.level).name,
+                    paymentAmount: data.payment_amount,
+                    classtype: data.classtype,
+                    street: data.street,
+                    housenumber: data.housenumber,
+                    postalcode: data.postalcode,
+                    city: data.city,
+                    phone_1: data.phone_1,
+                    phone_2: data.phone_2
+                }),
+            });
+
+            if (!response.ok) toast.error('Er ging iets mis bij het versturen van de mail!')
+            else toast.success('Een bevestigingsmail is verstuurd!')
 
             // We will not send a mail when student is updated
             if (type === 'update') {
