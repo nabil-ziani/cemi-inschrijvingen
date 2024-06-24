@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, Button, useDisclosure } from '@nextui-org/react'
+import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, useDisclosure } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
@@ -9,11 +9,10 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
 import { DatePicker } from "@nextui-org/react";
-import { ClassTypeEnum, EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
+import { ClassTypeEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
-import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
@@ -22,8 +21,8 @@ import { z } from "zod"
 import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
 import EnrollmentButton from './EnrollmentButton';
-import { Database } from '@/utils/database.types';
 import EnrollmentNotice from './EnrollmentNotice';
+import { enrollExistingStudent, enrollNewStudent, updateStudent } from '@/actions/enrollmentActions';
 
 interface EnrollmentFormProps {
     levels: Array<Level> | null
@@ -92,7 +91,6 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
     const [loading, setLoading] = useState(false)
 
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const supabase = createClient();
     const router = useRouter()
     const searchParams = useSearchParams()
 
@@ -115,19 +113,19 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
         resolver: zodResolver(formSchema),
         mode: 'onSubmit',
         defaultValues: {
-            firstname: enrollment && capitalize(enrollment.student?.firstname) || '',
-            lastname: enrollment && capitalize(enrollment.student?.lastname) || '',
-            birthdate: enrollment?.student?.birthdate && parseDate(enrollment?.student?.birthdate) || new CalendarDate(2000, 1, 1),
+            firstname: enrollment?.student.firstname && capitalize(enrollment.student.firstname) || '',
+            lastname: enrollment?.student.lastname && capitalize(enrollment.student.lastname) || '',
+            birthdate: enrollment?.student.birthdate && parseDate(enrollment.student.birthdate) || new CalendarDate(2000, 1, 1),
             gender: enrollment && enrollment.student?.gender == 'f' ? true : false || false,
             phone_1: enrollment && enrollment.student?.phone_1 || '',
             phone_2: enrollment && enrollment.student?.phone_2 || '',
             email_1: enrollment && enrollment.student?.email_1 || '',
             email_2: enrollment && enrollment.student?.email_2 || '',
             homeAlone: enrollment && enrollment.student?.homeAlone || false,
-            street: enrollment && capitalize(enrollment.student?.street) || '',
+            street: enrollment?.student.street && capitalize(enrollment.student.street) || '',
             housenumber: enrollment && enrollment.student?.housenumber || '',
             postalcode: enrollment && enrollment.student?.postalcode || '',
-            city: enrollment && capitalize(enrollment.student?.city) || '',
+            city: enrollment?.student.city && capitalize(enrollment.student.city) || '',
             remarks: enrollment && enrollment.student?.remarks || '',
             level: enrollment && newLevel?.levelid || '',
             classtype: enrollment && enrollment.type || '',
@@ -142,66 +140,33 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             // If gender = true, send 'f' otherwise 'm'
             setLoading(true);
 
-            const { data: studentData, error: studentError } = await supabase
-                .from('student')
-                .upsert({
-                    studentid: enrollment ? enrollment.studentid : undefined,
-                    firstname: data.firstname,
-                    lastname: data.lastname,
-                    gender: genderIsSelected ? 'f' : 'm',
-                    birthdate: data.birthdate.toString(),
-                    phone_1: data.phone_1,
-                    phone_2: data.phone_2,
-                    email_1: data.email_1,
-                    email_2: data.email_2,
-                    homeAlone: data.homeAlone,
-                    street: data.street,
-                    housenumber: data.housenumber,
-                    postalcode: data.postalcode,
-                    city: data.city,
-                    remarks: data.remarks
-                }, { onConflict: 'studentid' })
-                .select();
+            if (type === 'enroll') {
+                const student = await enrollExistingStudent(enrollment, data, genderIsSelected)
+                router.replace('/')
 
-            if (studentError) throw studentError;
+                toast.success(`${student.firstname} is heringeschreven!`)
+                setLoading(false)
+            }
 
-            const studentId = studentData[0].studentid;
+            if (type === 'new') {
+                const student = await enrollNewStudent(enrollment, data, genderIsSelected)
+                router.replace('/')
 
-            // --- Update 2023 enrollment, set completed to true ---
-            // Enrollments which are completed will not be editable 
-            const { error: enrollmentUpdateError } = await supabase
-                .from('enrollment')
-                .upsert({
-                    enrollmentid: enrollment ? enrollment.enrollmentid : undefined,
-                    studentid: studentId,
-                    year: 2023,
-                    status: EnrollmentStatusEnum.Enum.Ingeschreven,
-                    completed: true
-                }, { onConflict: 'enrollmentid' })
-                .select();
+                toast.success(`${student.firstname} is ingeschreven!`)
+                setLoading(false)
+            }
 
-            if (enrollmentUpdateError) throw enrollmentUpdateError;
+            if (type === 'update') {
+                const student = await updateStudent(enrollment, data, genderIsSelected)
+                router.replace('/')
 
-            // --- Create NEW 2024 enrollment ---
-            const { error: enrollmentError } = await supabase
-                .from('enrollment')
-                .insert({
-                    studentid: studentId,
-                    classid: null,
-                    year: 2024,
-                    passed: null,
-                    payment_amount: data.payment_amount,
-                    status: EnrollmentStatusEnum.Enum.Ingeschreven,
-                    levelid: data.level,
-                    payment_complete: data.classtype == ClassTypeEnum.Enum.Weekend ? data.payment_amount == 240 : data.payment_amount == 130,
-                    completed: false,
-                    type: data.classtype as Database["public"]["Enums"]["classtype"]
-                })
-                .select();
-
-            if (enrollmentError) throw enrollmentError;
+                toast.success(`${student.firstname} is aangepast!`)
+                setLoading(false)
+            }
 
             // --- SEND EMAIL ---
+            // TODO: add in mail the status (Onder Voorbehoud?)
+            // TODO: create method "sendEmail" which takes a type because differnt things should be sent depending on type
             const response = await fetch('/api/send', {
                 method: 'POST',
                 headers: {
@@ -225,13 +190,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                 toast.error('Er ging iets mis bij het versturen van de mail!')
             }
 
-            toast.success(`${studentData[0].firstname} is ingeschreven!`)
         } catch (error: any) {
-            console.log(error)
             toast.error('Oeps, er ging iets mis bij het inschrijven!')
-        } finally {
-            setLoading(false)
-            router.push('/')
         }
     };
 

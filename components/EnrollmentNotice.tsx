@@ -13,6 +13,22 @@ interface EnrollmentNoticeProps {
 
 const EnrollmentNotice = ({ enrollment, type, currentLevel, newLevel, newEnrollment }: EnrollmentNoticeProps) => {
 
+    if (type === 'new') {
+        return (
+            < Card className='my-4 py-4 px-5 xl:max-w-[1800px] bg-warning-50'>
+                <CardHeader className='flex justify-between items-center'>
+                    <div className='flex items-center'>
+                        <h2 className='mr-6 font-medium leading-none text-warning-700'>
+                            <div className='flex items-center w-full justify-end'>
+                                De student wordt &nbsp;<span className='font-bold'>onder voorbehoud</span>&nbsp; ingeschreven. Geen betaling aannemen!
+                            </div>
+                        </h2>
+                    </div>
+                </CardHeader>
+            </Card >
+        )
+    }
+
     if (enrollment && type === 'enroll') {
         return (
             <Card className='my-4 py-4 px-5 xl:max-w-[1800px]'>
