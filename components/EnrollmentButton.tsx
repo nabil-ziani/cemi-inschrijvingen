@@ -26,7 +26,7 @@ const EnrollmentButton = ({ enrollment, loading, type }: EnrollmentButtonProps) 
         }
     }
 
-    if (type == 'update') {
+    if (type == 'update' || type == 'ref') {
         return <Button type='submit' color='primary' variant='solid'>Aanpassen</Button>
     }
 
