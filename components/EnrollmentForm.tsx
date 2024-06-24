@@ -132,6 +132,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             payment_amount: type === 'update' || type === 'view' ? enrollment?.payment_amount : 0
         }
     });
+    console.log(enrollment)
 
     // --- Make new enrollment for year 2024 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
@@ -159,6 +160,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             if (type === 'update') {
                 const student = await updateStudent(enrollment, data, genderIsSelected)
                 router.replace('/')
+                router.refresh()
 
                 toast.success(`${student.firstname} is aangepast!`)
                 setLoading(false)
@@ -209,6 +211,29 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             }
         }
     }, [enrollment])
+
+    function getPaymentDescription(value, classType) {
+        const fullAmount = enrollment?.year === 2023 ? 110 : 130;
+        if (!value) return '';
+
+        if (classType === ClassTypeEnum.Enum.Weekend) {
+            if (value === 240) {
+                return 'Volledig ✅';
+            } else if (value > 0 && value < 240) {
+                return 'Voorschot 👍';
+            } else {
+                return 'Teveel ❌';
+            }
+        } else {
+            if (value === fullAmount) {
+                return 'Volledig ✅';
+            } else if (value > 0 && value < fullAmount) {
+                return 'Voorschot 👍';
+            } else {
+                return 'Teveel ❌';
+            }
+        }
+    }
 
     return (
         <>
@@ -391,21 +416,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                             label='Betaling'
                                                             labelPlacement='outside'
                                                             placeholder='0.00'
-                                                            description={
-                                                                !field.value
-                                                                    ? ''
-                                                                    : Array.from(valueClassType)[0] === ClassTypeEnum.Enum.Weekend
-                                                                        ? (field.value === 240
-                                                                            ? 'Volledig ✅'
-                                                                            : field.value < 240 && field.value > 0
-                                                                                ? 'Voorschot 👍'
-                                                                                : 'Teveel ❌')
-                                                                        : (field.value === 130
-                                                                            ? 'Volledig ✅'
-                                                                            : field.value < 130 && field.value > 0
-                                                                                ? 'Voorschot 👍'
-                                                                                : 'Teveel ❌')
-                                                            }
+                                                            description={getPaymentDescription(field.value, Array.from(valueClassType)[0])}
                                                             className='text-sm font-medium leading-6'
                                                             startContent={
                                                                 <div className="pointer-events-none flex items-center">

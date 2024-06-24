@@ -64,5 +64,4 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
         </>
     )
 }
-
 export default EnrollmentPage
