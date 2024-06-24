@@ -129,7 +129,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
             remarks: enrollment && enrollment.student?.remarks || '',
             level: enrollment && newLevel?.levelid || '',
             classtype: enrollment && enrollment.type || '',
-            payment_amount: type == 'update' ? enrollment?.payment_amount : 0
+            payment_amount: type === 'update' || type === 'view' ? enrollment?.payment_amount : 0
         }
     });
 
