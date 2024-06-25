@@ -22,8 +22,8 @@ export async function POST(req: Request) {
 
         const { data, error } = await resend.emails.send({
             from: 'CEMI <kids@cemi-antwerp.be>',
-            to: [email_1],
-            cc: [email_2],
+            to: 'ziani_nabil@outlook.com',
+            // cc: [email_2],
             subject: 'Bevestiging van je inschrijving',
             react: EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2 }),
         });

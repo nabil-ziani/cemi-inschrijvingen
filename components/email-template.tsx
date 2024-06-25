@@ -14,9 +14,6 @@ interface EmailTemplateProps {
 }
 
 export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2 }) => {
-    console.log(phone_1)
-    console.log(phone_2)
-
     return (
         <div style={{ minWidth: '100%', margin: '0px', padding: '0px', backgroundColor: '#F4F4F4' }}>
             <div className="t64" style={{ backgroundColor: '#F4F4F4' }}>
