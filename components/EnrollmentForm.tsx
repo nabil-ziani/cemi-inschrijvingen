@@ -424,7 +424,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            isDisabled={enrollment?.completed}
+                                                            isDisabled={enrollment?.completed || type == 'ref' || type == 'new'}
                                                             isRequired
                                                             value={field.value.toString()}
                                                             onChange={(e) => field.onChange(parseInt(e.target.value))}
