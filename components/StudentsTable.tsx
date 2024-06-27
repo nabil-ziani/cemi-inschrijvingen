@@ -1,27 +1,28 @@
 'use client'
 
 import { useCallback, useMemo, useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, Tooltip, useDisclosure } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Input, Button, DropdownTrigger, Dropdown, DropdownMenu, DropdownItem, Chip, User, Pagination, SortDescriptor, Selection, useDisclosure } from "@nextui-org/react";
 import { SearchIcon } from "@/components/icons/SearchIcon";
 import { ChevronDownIcon } from "@/components/icons/ChevronDownIcon";
 import { columns, statusOptions } from "@/constants";
-import { capitalize } from "@/lib/utils";
+import { capitalize, getLevelById } from "@/lib/utils";
 import { formatCurrency } from "@/utils/numberUtils";
-import { Enrollment, EnrollmentWithStudentClass } from "@/utils/types";
+import { Enrollment, EnrollmentWithStudentClass, Level } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import RowActions from "./RowActions";
 
 const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "payment_complete", "status", "actions"];
 
 interface StudentsProps {
-    data: EnrollmentWithStudentClass[],
+    enrollments: EnrollmentWithStudentClass[],
+    levels: Array<Level>,
     loading: boolean
 }
 
-export default function StudentsTable({ data, loading }: StudentsProps) {
+export default function StudentsTable({ enrollments, levels, loading }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState<Selection>(new Set(["Niet heringeschreven", "Ingeschreven", "Onder voorbehoud"]));
+    const [statusFilter, setStatusFilter] = useState<Selection>(new Set(["Niet heringeschreven", "Ingeschreven"]));
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "firstname",
@@ -42,7 +43,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
     }, [visibleColumns]);
 
     const filteredItems = useMemo(() => {
-        let filteredEnrollments = [...data!];
+        let filteredEnrollments = [...enrollments!];
 
         if (hasSearchFilter) {
             filteredEnrollments = filteredEnrollments.filter((enrollment) => {
@@ -64,7 +65,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         }
 
         return filteredEnrollments;
-    }, [data, filterValue, statusFilter]);
+    }, [enrollments, filterValue, statusFilter]);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -108,6 +109,23 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                     <Chip className="capitalize" size="sm" variant="flat" radius="sm" color={cellValue == true ? 'success' : 'danger'}>
                         {formatCurrency(enrollment.payment_amount)}
                     </Chip>
+                );
+            case "level":
+                return (
+                    <div className="flex gap-4">
+                        {enrollment.levelid ?
+                            <Chip
+                                variant="flat"
+                                color="primary"
+                                radius="sm"
+                            >
+                                {getLevelById(levels, enrollment?.levelid)?.name}
+                            </Chip>
+                            :
+                            <p className="text-bold text-sm text-default-400">Geen niveau</p>
+                        }
+
+                    </div>
                 );
             case "class_type":
                 return (
@@ -217,7 +235,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
                     </div>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-default-400 text-small">Totaal: {data!.length} leerlingen</span>
+                    <span className="text-default-400 text-small">Totaal: {enrollments!.length} leerlingen</span>
                     <label className="flex items-center text-default-400 text-small">
                         Aantal rijen:&nbsp;
                         <select
@@ -238,7 +256,7 @@ export default function StudentsTable({ data, loading }: StudentsProps) {
         visibleColumns,
         onSearchChange,
         onRowsPerPageChange,
-        data!.length,
+        enrollments!.length,
         hasSearchFilter,
     ]);
 

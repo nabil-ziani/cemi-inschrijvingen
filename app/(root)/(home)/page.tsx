@@ -12,15 +12,14 @@ export default async function Index() {
   if (!user) redirect('/auth/sign-in')
 
   // --- Get Enrollments of 2023 ---
-  const getEnrollments = async () => {
-    const { data } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', '2023');
+  const { data: enrollments, error: enrollmentsError } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', '2023');
+  if (enrollmentsError) throw new Error("Error fetching levels" + enrollmentsError);
 
-    return data;
-  }
-
-  const data = await getEnrollments()
+  // --- Get levels to show them in table ---
+  const { data: levels, error: levelsError } = await supabase.from('level').select().order('name', { ascending: true })
+  if (levelsError) throw new Error("Error fetching levels" + levelsError);
 
   return (
-    <Students data={data} />
+    <Students enrollments={enrollments} levels={levels} />
   );
 }
