@@ -13,6 +13,7 @@ export const sidebarLinks = [
 
 export const columns = [
     { name: "Naam", uid: "firstname", sortable: true },
+    { name: "Niveau", uid: "level", sortable: true },
     { name: "Type Klas", uid: "class_type", sortable: true },
     { name: "Betaling", uid: "payment_complete", sortable: true },
     { name: "Resultaat", uid: "passed", sortable: true },

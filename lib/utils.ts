@@ -1,4 +1,4 @@
-import { Level, LevelTypeEnum } from "@/utils/types";
+import { Level } from "@/utils/types";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 

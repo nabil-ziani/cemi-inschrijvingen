@@ -1,6 +1,6 @@
 'use client'
 
-import { ClassType, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, useDisclosure } from '@nextui-org/react'
 import { CalendarDate, parseDate } from "@internationalized/date";
 import { Checkbox } from "@nextui-org/react";
@@ -25,7 +25,7 @@ import EnrollmentNotice from './EnrollmentNotice';
 import { enrollExistingStudent, enrollNewStudent, updateRefStudent, updateStudent } from '@/actions/enrollmentActions';
 
 interface EnrollmentFormProps {
-    levels: Array<Level> | null
+    levels: Array<Level>
     enrollment: EnrollmentWithStudentClass | null,
     newEnrollment?: EnrollmentWithStudentClass | null
 }
@@ -424,7 +424,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                 <FormItem>
                                                     <FormControl>
                                                         <Input
-                                                            isDisabled={enrollment?.completed}
+                                                            isDisabled={enrollment?.completed || type == 'ref' || type == 'new'}
                                                             isRequired
                                                             value={field.value.toString()}
                                                             onChange={(e) => field.onChange(parseInt(e.target.value))}
