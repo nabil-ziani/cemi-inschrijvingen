@@ -32,7 +32,7 @@ export const enrollExistingStudent = async (enrollment: EnrollmentWithStudentCla
 
     const studentId = studentData[0].studentid;
 
-    // Update 2023 enrollment 
+    // Update 2024 enrollment 
     // Setting completed to true - enrollments which are completed will not be editable 
     const { error: enrollmentUpdateError } = await supabase
         .from('enrollment')
@@ -44,13 +44,13 @@ export const enrollExistingStudent = async (enrollment: EnrollmentWithStudentCla
 
     if (enrollmentUpdateError) throw enrollmentUpdateError;
 
-    // --- Create NEW 2024 enrollment ---
+    // --- Create NEW 2025 enrollment ---
     const { error: enrollmentError } = await supabase
         .from('enrollment')
         .insert({
             studentid: studentId,
             classid: null,
-            year: 2024,
+            year: 2025,
             passed: null,
             payment_amount: data.payment_amount,
             status: EnrollmentStatusEnum.Enum.Ingeschreven,
@@ -93,13 +93,13 @@ export const enrollNewStudent = async (data: any, genderIsSelected: boolean) => 
 
     const studentId = studentData[0].studentid;
 
-    // --- Create NEW 2024 enrollment ---
+    // --- Create NEW 2025 enrollment ---
     const { error: enrollmentError } = await supabase
         .from('enrollment')
         .insert({
             studentid: studentId,
             classid: null,
-            year: 2024,
+            year: 2025,
             passed: null,
             payment_amount: data.payment_amount,
             status: EnrollmentStatusEnum.Enum["Onder voorbehoud"],

@@ -13,7 +13,7 @@ interface StudentsProps {
 }
 
 const Students = ({ enrollments, levels }: StudentsProps) => {
-    const [selectedKeys, setSelectedKeys] = useState<any>(new Set(["2023"]));
+    const [selectedKeys, setSelectedKeys] = useState<any>(new Set(["2024"]));
     const [loading, setLoading] = useState(true)
     const [students, setStudents] = useState<Array<EnrollmentWithStudentClass>>(enrollments)
 
@@ -63,8 +63,8 @@ const Students = ({ enrollments, levels }: StudentsProps) => {
                         selectedKeys={selectedKeys}
                         onSelectionChange={setSelectedKeys}
                     >
-                        <DropdownItem key="2023">2023-2024</DropdownItem>
                         <DropdownItem key="2024">2024-2025</DropdownItem>
+                        <DropdownItem key="2025">2025-2026</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
             </div>

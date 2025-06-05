@@ -83,7 +83,7 @@ export const EnrollmentSchema = z.object({
     payment_complete: z.boolean(),
     status: EnrollmentStatusEnum,
     studentid: z.string(),
-    year: z.number().default(2024),
+    year: z.number().default(2025),
 });
 
 export const ClassSchema = z.object({

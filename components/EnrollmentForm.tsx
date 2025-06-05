@@ -133,7 +133,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
         }
     });
 
-    // --- Make new enrollment for year 2024 ---
+    // --- Make new enrollment for year 2025 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             // If enrollment is null, new student will be created otherwise linked student will be updated

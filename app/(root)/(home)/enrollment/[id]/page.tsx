@@ -18,10 +18,10 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
 
     if (levelsError) throw new Error("Error fetching levels" + levelsError);
 
-    // --- Get old enrollment (2023) to prefill form with existing data ---
-    // This will always be from year 2023, because user comes from table where only 2023-records are shown
+    // --- Get old enrollment (2024) to prefill form with existing data ---
+    // This will always be from year 2024, because user comes from table where only 2024-records are shown
     const getCurrentEnrollment = async (): Promise<EnrollmentWithStudentClass | null> => {
-        // ID will be null when student is new (no 2023-enrollment)
+        // ID will be null when student is new (no 2024-enrollment)
         if (id === 'null') {
             return null
         } else {
@@ -34,11 +34,11 @@ const EnrollmentPage = async ({ params: { id } }: { params: { id: string } }) =>
     }
 
     const getNewEnrollment = async (studentid: string): Promise<EnrollmentWithStudentClass | null> => {
-        // ID will be null when student is new (no 2023-enrollment)
+        // ID will be null when student is new (no 2024-enrollment)
         if (id === 'null') {
             return null
         } else {
-            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('studentid', studentid).eq('year', 2024).limit(1).single()
+            const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('studentid', studentid).eq('year', 2025).limit(1).single()
 
             if (error) throw new Error("Error fetching new enrollment" + error);
 

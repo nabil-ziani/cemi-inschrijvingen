@@ -46,7 +46,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
         )
     }
 
-    if (enrollment.year == 2023 && enrollment.completed) {
+    if (enrollment.year == 2024 && enrollment.completed) {
         return (
             <>
                 <Tooltip content="Bekijken">
