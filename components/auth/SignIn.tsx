@@ -133,9 +133,6 @@ export function SignIn({ error }: SignInProps) {
                             errorMessage={errors.password?.message}
                             className="max-w-xs"
                         />
-                        <p className="text-sm text-gray-500 mt-2 underline hover:cursor-pointer" onClick={() => router.push('/password/reset')}>
-                            Wachtwoord vergeten?
-                        </p>
                     </div>
                     <SubmitButton text={loading ? 'Laden...' : 'Login'} loading={loading} />
                     {/* <Divider />
