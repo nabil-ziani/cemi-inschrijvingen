@@ -11,7 +11,7 @@ import { Enrollment, EnrollmentWithStudentClass, Level } from "@/utils/types";
 import EnrollmentModal from "./EnrollmentModal";
 import RowActions from "./RowActions";
 
-const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "payment_complete", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["firstname", "lastname", "class_type", "level", "status", "actions"];
 
 interface StudentsProps {
     enrollments: EnrollmentWithStudentClass[],
