@@ -33,7 +33,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
         onOpen();
     }
 
-    if (enrollment.year == 2024 && enrollment.status == EnrollmentStatusEnum.Enum.Ingeschreven) {
+    if (enrollment.year == 2025 && enrollment.status == EnrollmentStatusEnum.Enum.Ingeschreven) {
         return (
             <>
                 <Tooltip content="Wijzigen">
