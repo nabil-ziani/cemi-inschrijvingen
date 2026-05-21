@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import Link from "next/link";
 import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
 import toast from 'react-hot-toast';
 import { EyeFilledIcon } from '../icons/EyeFilledIcon';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
-import { Button, Divider, Input } from '@nextui-org/react';
+import { Input } from '@heroui/react';
 import { MailIcon } from '../icons/MailIcon';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';

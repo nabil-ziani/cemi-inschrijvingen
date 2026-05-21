@@ -4,9 +4,16 @@ export const metadata = {
   title: 'Login'
 }
 
-export default async function SignInPage({ searchParams }: { searchParams: { msg: string } }) {
+interface SignInPageProps {
+  searchParams?: Promise<{
+    msg: string
+  }>
+}
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const { msg } = await searchParams || {};
 
   return (
-    <SignIn error={searchParams.msg} />
+    <SignIn error={msg} />
   );
 }

@@ -1,28 +1,40 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardFooter, CardHeader, Chip, Input, Switch, Divider, useDisclosure } from '@nextui-org/react'
-import { CalendarDate, parseDate } from "@internationalized/date";
-import { Checkbox } from "@nextui-org/react";
 import { I18nProvider } from "@react-aria/i18n";
-import { Select, SelectItem } from "@nextui-org/react";
-import { Textarea } from "@nextui-org/react";
 import { capitalize, getLevelById, getNextLevel } from '@/lib/utils';
-import { DatePicker } from "@nextui-org/react";
 import { ClassTypeEnum, EnrollmentWithStudentClass, Level } from '@/utils/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 import { useRouter } from 'next/navigation';
-import { MailIcon } from './icons/MailIcon';
 import { toast } from 'react-hot-toast';
 import { parsePhoneNumber } from 'libphonenumber-js'
 import { z } from "zod"
-import EnrollmentModal from './EnrollmentModal';
 import { useSearchParams } from 'next/navigation'
+import { enrollExistingStudent, enrollNewStudent, updateRefStudent, updateStudent } from '@/actions/enrollmentActions';
+import { CalendarDate, parseDate } from "@internationalized/date";
+
+import { 
+    Card, 
+    CardBody, 
+    CardFooter, 
+    CardHeader, 
+    Chip, 
+    Input, 
+    Switch, 
+    Divider, 
+    useDisclosure,
+    DatePicker,
+    Textarea,
+    Select,
+    SelectItem,
+    Checkbox
+} from '@heroui/react'
+import { MailIcon } from './icons/MailIcon';
 import EnrollmentButton from './EnrollmentButton';
 import EnrollmentNotice from './EnrollmentNotice';
-import { enrollExistingStudent, enrollNewStudent, updateRefStudent, updateStudent } from '@/actions/enrollmentActions';
+import EnrollmentModal from './EnrollmentModal';
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
 
 interface EnrollmentFormProps {
     levels: Array<Level>
@@ -560,7 +572,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                             labelPlacement='outside'
                                                             placeholder='gebruiker@cemi-antwerp.be'
                                                             startContent={
-                                                                <MailIcon className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
+                                                                <MailIcon className="text-xl text-default-400 pointer-events-none shrink-0" />
                                                             }
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
@@ -593,7 +605,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                                                             className='text-sm font-medium leading-6'
                                                             color='default'
                                                             startContent={
-                                                                <MailIcon className="text-xl text-default-400 pointer-events-none flex-shrink-0" />
+                                                                <MailIcon className="text-xl text-default-400 pointer-events-none shrink-0" />
                                                             }
                                                             isInvalid={form.formState.errors.email_2 !== undefined}
                                                             errorMessage={form.formState.errors.email_2?.message}

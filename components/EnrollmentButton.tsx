@@ -1,4 +1,4 @@
-import { Button } from '@nextui-org/button';
+import { Button } from '@heroui/button';
 import React from 'react'
 import { SubmitButton } from './SubmitButton';
 import { EnrollmentStatusEnum, EnrollmentWithStudentClass } from '@/utils/types';

@@ -4,9 +4,16 @@ export const metadata = {
     title: 'Registreer'
 }
 
-export default async function SignUpPage({ searchParams }: { searchParams: { msg: string } }) {
+interface SignUpPageProps {
+    searchParams?: Promise<{
+      msg: string
+    }>
+  }
+
+export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+    const { msg } = await searchParams || {};
 
     return (
-        <SignUp error={searchParams.msg} />
+        <SignUp error={msg} />
     );
 }

@@ -1,16 +1,12 @@
+import React, { ReactNode } from 'react'
+import { Metadata } from 'next';
+
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
-import { Metadata } from 'next';
-import React, { ReactNode } from 'react'
-
-const defaultUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
 
 export const metadata: Metadata = {
-    metadataBase: new URL(defaultUrl),
     title: "CEMI",
-    description: "CEMI app om een overzicht van de leerlingen te krijgen en inschrijvingen te beheren.",
+    description: "CEMI webapp om een inschrijvingen te beheren.",
 };
 
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {

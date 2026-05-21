@@ -7,7 +7,7 @@ import { createClient } from '@/utils/supabase/server'
 import { SubmitHandler } from 'react-hook-form'
 
 export const signIn: SubmitHandler<any> = async (formData) => {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const email = formData.email as string;
     const password = formData.password as string;
@@ -23,7 +23,7 @@ export const signIn: SubmitHandler<any> = async (formData) => {
 };
 
 export const signUp: SubmitHandler<any> = async (formData) => {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const data = {
         email: formData.email as string,

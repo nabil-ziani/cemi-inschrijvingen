@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react'
 import { EnrollmentStatusEnum, EnrollmentWithStudentClass } from '@/utils/types'
-import { Tooltip } from '@nextui-org/react';
+import { Tooltip } from '@heroui/react';
 import { EyeIcon } from './icons/EyeIcon';
 import DeleteTooltip from './DeleteTooltip';
 import { useRouter } from 'next/navigation';

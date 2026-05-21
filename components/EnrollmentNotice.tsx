@@ -1,6 +1,6 @@
 import { capitalize } from '@/lib/utils'
 import { EnrollmentStatusEnum, EnrollmentWithStudentClass, Level } from '@/utils/types'
-import { Card, CardHeader, Link } from '@nextui-org/react'
+import { Card, CardHeader, Link } from '@heroui/react'
 import React from 'react'
 
 interface EnrollmentNoticeProps {

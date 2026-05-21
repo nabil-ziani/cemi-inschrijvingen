@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react'
-import { Tooltip } from '@nextui-org/react'
+import { Tooltip } from '@heroui/react'
 import { EnrollmentWithStudentClass } from '@/utils/types';
 import { UserX } from 'lucide-react';
 import { capitalize } from '@/lib/utils';

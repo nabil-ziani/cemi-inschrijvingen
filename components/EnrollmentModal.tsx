@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from "react";
-import { Modal, ModalContent, ModalBody, ModalFooter, Button, Switch } from "@nextui-org/react";
+import { Modal, ModalContent, ModalBody, ModalFooter, Button, Switch } from "@heroui/react";
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 import { createClient } from "@/utils/supabase/client";
 import { Check, Euro, X } from "lucide-react";

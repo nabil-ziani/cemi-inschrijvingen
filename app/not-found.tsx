@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition, TransitionChild } from '@headlessui/react'
-import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react'
+import { Card, CardBody, CardHeader, Divider } from '@heroui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/solid'
 
 export default function NotFoundPage() {

@@ -5,7 +5,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import Image from "next/image";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createClient } from "@/utils/supabase/client";
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { EyeSlashFilledIcon } from "../icons/EyeSlashFilledIcon";
 import { EyeFilledIcon } from "../icons/EyeFilledIcon";

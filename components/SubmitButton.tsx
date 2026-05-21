@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/react";
 
 interface SubmitButtonProps {
     text: string

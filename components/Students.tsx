@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/react'
+import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react'
 import StudentsTable from './StudentsTable'
 import { EnrollmentWithStudentClass, Level } from '@/utils/types'
 import toast from 'react-hot-toast'
@@ -28,7 +28,7 @@ const Students = ({ enrollments, levels }: StudentsProps) => {
         try {
             const fetchData = async () => {
                 const getEnrollments = async (year: string) => {
-                    const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', year);
+                    const { data, error } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', parseInt(year));
                     return data;
                 }
 

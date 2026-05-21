@@ -25,7 +25,7 @@ export async function POST(req: Request) {
             to: [email_1],
             cc: [email_2],
             subject: 'Bevestiging van je inschrijving',
-            react: EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2 }),
+            react: await EmailTemplate({ name, level, classtype, paymentAmount, street, housenumber, postalcode, city, phone_1, phone_2 }),
         });
 
         if (error) {

@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { EyeSlashFilledIcon } from '../icons/EyeSlashFilledIcon';
 import { EyeFilledIcon } from '../icons/EyeFilledIcon';
-import { Input } from '@nextui-org/react';
+import { Input } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import { MailIcon } from '../icons/MailIcon';
 import toast from 'react-hot-toast';
