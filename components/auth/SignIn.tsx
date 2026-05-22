@@ -109,7 +109,7 @@ export function SignIn({ error }: SignInProps) {
                             isInvalid={errors.email !== undefined}
                             errorMessage={errors.email?.message}
                             endContent={
-                                <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                                <MailIcon className={`text-2xl pointer-events-none shrink-0 h-full ${ !errors.email ? 'text-default-400' : 'text-red-500' }`} />
                             }
                         />
                     </div>
@@ -119,11 +119,11 @@ export function SignIn({ error }: SignInProps) {
                             variant="bordered"
                             {...register('password')}
                             endContent={
-                                <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
+                                <button className="focus:outline-none h-full" type="button" onClick={toggleVisibility}>
                                     {passwordVisible ? (
-                                        <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        <EyeSlashFilledIcon className={`text-2xl pointer-events-none ${ !errors.password ? 'text-default-400' : 'text-red-500' }`} />
                                     ) : (
-                                        <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+                                        <EyeFilledIcon className={`text-2xl pointer-events-none ${ !errors.password ? 'text-default-400' : 'text-red-500' }`} />
                                     )}
                                 </button>
                             }
