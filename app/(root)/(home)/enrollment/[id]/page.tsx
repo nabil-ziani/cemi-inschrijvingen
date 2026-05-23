@@ -26,10 +26,10 @@ const EnrollmentPage = async ({ searchParams }: EnrollmentPageProps) => {
 
 	if (levelsError) throw new Error("Error fetching levels" + levelsError);
 
-	// --- Get old enrollment (2024) to prefill form with existing data ---
-	// This will always be from year 2024, because user comes from table where only 2024-records are shown
+	// --- Get old enrollment (2025) to prefill form with existing data ---
+	// This will always be from year 2025, because user comes from table where only 2025-records are shown
 	const getCurrentEnrollment = async (): Promise<EnrollmentWithStudentClass | null> => {
-		// ID will be null when student is new (no 2024-enrollment)
+		// ID will be null when student is new (no 2025-enrollment)
 		if (id === 'null') {
 			return null
 		} else {
@@ -42,7 +42,7 @@ const EnrollmentPage = async ({ searchParams }: EnrollmentPageProps) => {
 	}
 
 	const getNewEnrollment = async (studentid: string): Promise<EnrollmentWithStudentClass | null> => {
-		// ID will be null when student is new (no 2024-enrollment)
+		// ID will be null when student is new (no 2025-enrollment)
 		if (id === 'null') {
 			return null
 		} else {

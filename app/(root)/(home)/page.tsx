@@ -11,8 +11,8 @@ export default async function Index() {
 
   if (!user) redirect('/auth/sign-in')
 
-  // --- Get Enrollments of 2024 ---
-  const { data: enrollments, error: enrollmentsError } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', 2024);
+  // --- Get Enrollments of 2025 ---
+  const { data: enrollments, error: enrollmentsError } = await supabase.from('enrollment').select(`*, student(*), class(*)`).eq('year', 2025);
   if (enrollmentsError) throw new Error("Error fetching levels" + enrollmentsError);
 
   // --- Get levels to show them in table ---

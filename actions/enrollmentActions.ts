@@ -32,7 +32,7 @@ export const enrollExistingStudent = async (enrollment: EnrollmentWithStudentCla
 
     const studentId = studentData[0].studentid;
 
-    // Update 2024 enrollment 
+    // Update 2025 enrollment 
     // Setting completed to true - enrollments which are completed will not be editable 
     const { error: enrollmentUpdateError } = await supabase
         .from('enrollment')
