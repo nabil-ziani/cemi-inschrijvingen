@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { parsePhoneNumber } from 'libphonenumber-js'
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { z } from "zod"
 import { useSearchParams } from 'next/navigation'
 import { enrollExistingStudent, enrollNewStudent, updateRefStudent, updateStudent } from '@/actions/enrollmentActions';
@@ -49,9 +49,7 @@ const formSchema = z.object({
     gender: z.boolean(),
     birthdate: z.instanceof(CalendarDate),
     phone_1: z.string().min(1, { message: 'Verplicht veld' }).transform((value, ctx) => {
-        const phoneNumber = parsePhoneNumber(value, {
-            defaultCountry: 'BE'
-        })
+        const phoneNumber = parsePhoneNumberFromString(value, { defaultCountry: 'BE' })
 
         if (!phoneNumber?.isValid()) {
             ctx.addIssue({
@@ -67,9 +65,7 @@ const formSchema = z.object({
         // This field is optional
         if (!value) return
 
-        const phoneNumber = parsePhoneNumber(value, {
-            defaultCountry: 'BE'
-        })
+        const phoneNumber = parsePhoneNumberFromString(value, { defaultCountry: 'BE' })
 
         if (!phoneNumber?.isValid()) {
             ctx.addIssue({
@@ -145,7 +141,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
         }
     });
 
-    // --- Make new enrollment for year 2025 ---
+    // --- Make new enrollment for year 2026 ---
     const onSubmit = async (data: z.infer<typeof formSchema>) => {
         try {
             // If enrollment is null, new student will be created otherwise linked student will be updated
@@ -189,6 +185,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
                     phone_2: data.phone_2
                 }),
             });
+
+            console.log(response)
 
             if (!response.ok)
                 toast.error('Er ging iets mis bij het versturen van de mail!')

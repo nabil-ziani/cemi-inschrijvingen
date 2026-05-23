@@ -6,13 +6,13 @@ import { capitalize } from '@/lib/utils';
 import { EnrollmentWithStudentClass } from '@/utils/types';
 
 interface EnrollmentPageProps {
-	searchParams?: Promise<{
+	params?: Promise<{
 		id: string
 	}>
 }
 
-const EnrollmentPage = async ({ searchParams }: EnrollmentPageProps) => {
-	const { id } = await searchParams || {};
+const EnrollmentPage = async ({ params }: EnrollmentPageProps) => {
+	const { id } = await params;
 	
 	const supabase = await createClient();
 

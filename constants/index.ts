@@ -20,7 +20,7 @@ export const columns = [
     { name: "Type Klas", uid: "class_type", sortable: true },
     { name: "Betaling", uid: "payment_complete", sortable: true },
     { name: "Resultaat", uid: "passed", sortable: true },
-    { name: "Status - 2025", uid: "status", sortable: true },
+    { name: "Status - 2026", uid: "status", sortable: true },
     { name: "Acties", uid: "actions", sortable: false },
 ]
 
