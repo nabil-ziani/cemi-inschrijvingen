@@ -1,10 +1,7 @@
-import React from 'react'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
-import Link from 'next/link'
-import MobileNav from './MobileNav'
-import AuthButton from './auth/AuthButton'
+import {Avatar} from "@heroui/react";
 
 export default async function Navbar() {
     const supabase = await createClient();
@@ -18,21 +15,9 @@ export default async function Navbar() {
     }
 
     return (
-        <nav className='flex-between fixed z-50 w-full bg-dark-1 px-6 py-4 lg:px-10'>
-            <Link href='/' className='flex items-center gap-1'>
-                <img
-                    src='/icons/logo.png'
-                    width={120}
-                    height={60}
-                    alt='CEMI'
-                    className='max-sm:size-10'
-                />
-            </Link>
-
-            <div className='flex-between gap-5'>
-                <AuthButton />
-
-                <MobileNav />
+        <nav className='flex fixed w-full bg-dark-1 px-6 py-4 lg:px-10 h-22.5'>
+            <div className='flex justify-end items-center gap-5 w-full'>
+                <Avatar isBordered color='primary' radius="full" showFallback name={user.email} />
             </div>
         </nav>
     )

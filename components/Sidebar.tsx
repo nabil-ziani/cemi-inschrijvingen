@@ -1,42 +1,65 @@
 'use client'
 
-import { cn } from '@/lib/utils';
-import { sidebarLinks } from '@/constants'
-import { usePathname } from 'next/navigation'
-
-import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils';
+import { sidebarLinks } from '@/constants';
+import { signOut } from '@/lib/actions/auth';
 
-const Sidebar = ({ }) => {
-    const pathname = usePathname();
+import { Tooltip } from '@heroui/react'
+import { ArrowRightFromSquare } from '@gravity-ui/icons';
 
-    return (
-        <section className="sticky left-0 top-0 flex h-screen w-fit flex-col justify-between bg-dark-1 p-6 pt-28 text-white max-sm:hidden lg:w-[264px]">
-            <div className="flex flex-1 flex-col gap-6">
-                {sidebarLinks.map((link) => {
-                    const isActive = link.route === '/' ? pathname === link.route : pathname.startsWith(`${link.route.split('/null')[0]}`);
-                    return (
-                        <Link
-                            href={`${link.route}`}
-                            key={link.label}
-                            className={cn('flex gap-4 items-center p-4 rounded-lg justify-start text-white', {
-                                'bg-[#e18438]': isActive
-                            })}>
-                            <Image
-                                src={link.imgUrl}
-                                alt={link.label}
-                                width={24}
-                                height={24}
-                            />
-                            <p className="text-md font-semibold max-lg:hidden">
-                                {link.label}
-                            </p>
-                        </Link>
-                    )
-                })}
-            </div>
-        </section>
-    )
+export function isSidebarLinkActive(pathname: string, route: string) {
+	if (route === '/') return pathname === route
+	return pathname.startsWith(route.split('/null')[0])
+}
+
+const Sidebar = () => {
+	const pathname = usePathname();
+
+	return (
+		<section className="sticky left-0 top-0 flex h-screen w-[88px] flex-col justify-between bg-dark-1 px-3 py-4 text-white max-sm:hidden">
+			<div className='mb-6'>
+				<Link href='/' className='flex items-center'>
+					<img
+						src='/logo-mobile.png'
+						width={60}
+						height={60}
+						alt='CEMI'
+						className='max-sm:size-10'
+					/>
+				</Link>
+			</div>
+			<div className="flex flex-1 flex-col gap-4">
+				{sidebarLinks.map((link) => {
+					const isActive = isSidebarLinkActive(pathname, link.route)
+					const Icon = isActive ? link.icons.active : link.icons.default
+
+					return (
+						<Tooltip key={link.label} content={link.label} placement="right" color="primary" size='lg'>
+							<span className="inline-flex w-full">
+								<Link
+									href={link.route}
+									className="flex mx-auto rounded-lg p-3 text-white transition-colors hover:bg-white/5"
+								>
+									<Icon width={26} height={26} className={cn('shrink-0', isActive ? 'text-white' : 'text-white/60')} aria-hidden />
+								</Link>
+							</span>
+						</Tooltip>
+					)
+				})}
+			</div>
+			<div>
+				<Tooltip content="Afmelden" placement="right" color="danger" size='lg'>
+					<span className="inline-flex w-full">
+						<span className="flex mx-auto rounded-full p-3 text-white bg-[#dc2626] transition-colors hover:bg-[#dc2626]/70 hover:cursor-pointer" onClick={signOut}>
+							<ArrowRightFromSquare width={26} height={26} aria-hidden />
+						</span>
+					</span>
+				</Tooltip>
+			</div>
+		</section>
+	)
 }
 
 export default Sidebar

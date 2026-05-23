@@ -30,7 +30,7 @@ const EnrollmentPage = async ({ searchParams }: EnrollmentPageProps) => {
 	// This will always be from year 2025, because user comes from table where only 2025-records are shown
 	const getCurrentEnrollment = async (): Promise<EnrollmentWithStudentClass | null> => {
 		// ID will be null when student is new (no 2025-enrollment)
-		if (id === 'null') {
+		if (!id) {
 			return null
 		} else {
 			const { data, error: enrollmentError } = await supabase.from('enrollment').select(`*, student(*), class(*, level(*))`).eq('enrollmentid', id).limit(1).single()

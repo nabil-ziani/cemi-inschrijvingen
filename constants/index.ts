@@ -1,15 +1,18 @@
+import { House, HouseFill, CirclePlus, CirclePlusFill } from '@gravity-ui/icons'
+
 export const sidebarLinks = [
     {
         label: 'Overzicht',
         route: '/',
-        imgUrl: '/icons/home.svg',
+        icons: { default: House, active: HouseFill },
     },
     {
-        label: 'Inschrijving',
+        label: 'Nieuwe inschrijving',
         route: '/enrollment/null?type=new',
-        imgUrl: '/icons/members.svg',
-    }
-]
+        icons: { default: CirclePlus, active: CirclePlusFill },
+    },
+] as const
+
 
 export const columns = [
     { name: "Naam", uid: "firstname", sortable: true },
