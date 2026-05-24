@@ -102,7 +102,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 	const router = useRouter()
 	const searchParams = useSearchParams()
 
-	console.log(process.env.APP_ENV)
+	console.log(process.env.NEXT_PUBLIC_APP_ENV)
 	
 	// MODAL
 	const handleOpen = () => {
@@ -167,7 +167,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 			}
 
 			// --- SEND CONFIRMATION EMAIL (only on production) ---
-			if (process.env.APP_ENV === "production") {
+			if (process.env.NEXT_PUBLIC_APP_ENV === "production") {
 				console.log("we zijn op productie")
 
 				const response = await fetch('/api/send', {
@@ -197,7 +197,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 					toast.success('Een bevestigingsmail is verstuurd!')
 			} 
 			
-			if (process.env.APP_ENV === "test") {
+			if (process.env.NEXT_PUBLIC_APP_ENV === "test") {
 				toast.success('We sturen geen mail vanuit het test-platform.')
 			}
 
