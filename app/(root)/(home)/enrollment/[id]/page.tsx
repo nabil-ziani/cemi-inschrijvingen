@@ -61,7 +61,7 @@ const EnrollmentPage = async ({ params }: EnrollmentPageProps) => {
 	if (enrollment && enrollment.completed) {
 		newEnrollment = await getNewEnrollment(enrollment.studentid)
 	}
-
+		
 	return (
 		<>
 			<div className="flex justify-between items-center">
