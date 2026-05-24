@@ -102,6 +102,8 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 	const router = useRouter()
 	const searchParams = useSearchParams()
 
+	console.log(process.env.APP_ENV)
+	
 	// MODAL
 	const handleOpen = () => {
 		onOpen();
@@ -196,7 +198,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 			} 
 			
 			if (process.env.APP_ENV === "test") {
-				console.log("we zijn op development")
+				toast.success('We sturen geen mail vanuit het test-platform.')
 			}
 
 			// We will not send a mail when student is updated
