@@ -35,11 +35,13 @@ import EnrollmentButton from './EnrollmentButton';
 import EnrollmentNotice from './EnrollmentNotice';
 import EnrollmentModal from './EnrollmentModal';
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form"
+import { Student } from '@/utils/types';
 
 interface EnrollmentFormProps {
 	levels: Array<Level>
 	enrollment: EnrollmentWithStudentClass | null,
 	newEnrollment?: EnrollmentWithStudentClass | null
+	siblingStudent?: Student | null
 }
 
 // *** ZOD VALIDATION ***
@@ -90,7 +92,7 @@ const formSchema = z.object({
 	classtype: z.string().min(1, { message: 'Verplicht veld' })
 });
 
-const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormProps) => {
+const EnrollmentForm = ({ levels, enrollment, newEnrollment, siblingStudent }: EnrollmentFormProps) => {
 	const [aloneIsSelected, setAloneIsSelected] = useState(enrollment?.student?.homeAlone || false);
 	const [genderIsSelected, setGenderIsSelected] = useState(enrollment?.student?.gender == 'f' ? true : false || false);
 	const [selectedStudent, setSelectedStudent] = useState<{ id: string, type: string, student: { id: string, name: string, payment_amount: number } }>()
@@ -119,23 +121,35 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 		newLevel = currentLevel
 	}
 
+	const siblingDefaults = {
+		lastname: siblingStudent?.lastname ? capitalize(siblingStudent.lastname) : '',
+		phone_1: siblingStudent?.phone_1 || '',
+		phone_2: siblingStudent?.phone_2 || '',
+		email_1: siblingStudent?.email_1 || '',
+		email_2: siblingStudent?.email_2 || '',
+		street: siblingStudent?.street ? capitalize(siblingStudent.street) : '',
+		housenumber: siblingStudent?.housenumber || '',
+		postalcode: siblingStudent?.postalcode || '',
+		city: siblingStudent?.city ? capitalize(siblingStudent.city) : '',
+	};
+
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		mode: 'onSubmit',
 		defaultValues: {
 			firstname: enrollment?.student.firstname && capitalize(enrollment.student.firstname) || '',
-			lastname: enrollment?.student.lastname && capitalize(enrollment.student.lastname) || '',
+			lastname: enrollment?.student.lastname && capitalize(enrollment.student.lastname) || siblingDefaults.lastname,
 			birthdate: enrollment?.student.birthdate && parseDate(enrollment.student.birthdate) || new CalendarDate(2000, 1, 1),
 			gender: enrollment && enrollment.student?.gender == 'f' ? true : false || false,
-			phone_1: enrollment && enrollment.student?.phone_1 || '',
-			phone_2: enrollment && enrollment.student?.phone_2 || '',
-			email_1: enrollment && enrollment.student?.email_1 || '',
-			email_2: enrollment && enrollment.student?.email_2 || '',
+			phone_1: enrollment && enrollment.student?.phone_1 || siblingDefaults.phone_1,
+			phone_2: enrollment && enrollment.student?.phone_2 || siblingDefaults.phone_2,
+			email_1: enrollment && enrollment.student?.email_1 || siblingDefaults.email_1,
+			email_2: enrollment && enrollment.student?.email_2 || siblingDefaults.email_2,
 			homeAlone: enrollment && enrollment.student?.homeAlone || false,
-			street: enrollment?.student.street && capitalize(enrollment.student.street) || '',
-			housenumber: enrollment && enrollment.student?.housenumber || '',
-			postalcode: enrollment && enrollment.student?.postalcode || '',
-			city: enrollment?.student.city && capitalize(enrollment.student.city) || '',
+			street: enrollment?.student.street && capitalize(enrollment.student.street) || siblingDefaults.street,
+			housenumber: enrollment && enrollment.student?.housenumber || siblingDefaults.housenumber,
+			postalcode: enrollment && enrollment.student?.postalcode || siblingDefaults.postalcode,
+			city: enrollment?.student.city && capitalize(enrollment.student.city) || siblingDefaults.city,
 			remarks: enrollment && enrollment.student?.remarks || '',
 			level: enrollment && newLevel?.levelid || '',
 			classtype: enrollment && enrollment.type || '',
@@ -158,7 +172,7 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 				setLoading(false)
 			}
 
-			if (type === 'new') {
+			if (type === 'new' || type === 'sibling') {
 				const student = await enrollNewStudent(data, genderIsSelected)
 				router.replace('/')
 
@@ -307,6 +321,13 @@ const EnrollmentForm = ({ levels, enrollment, newEnrollment }: EnrollmentFormPro
 						</CardHeader>
 						<Divider />
 						<CardBody>
+							{siblingStudent && !enrollment && (
+								<Card className='mb-6 rounded-xl font-medium border border-default-100 bg-warning-50 py-1 text-base text-warning-700 shadow-none'>
+									<CardHeader className='flex items-center'>
+										De student wordt &nbsp;<span className='font-bold'>onder voorbehoud</span>&nbsp; ingeschreven. Geen betaling aannemen!
+									</CardHeader>
+								</Card>
+							)}
 							<div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-6 mt-2">
 								{/* Voornaam - Familienaam - Geboortedatum */}
 								<div className="sm:col-span-2">

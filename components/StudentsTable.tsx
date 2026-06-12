@@ -22,7 +22,7 @@ interface StudentsProps {
 export default function StudentsTable({ enrollments, levels, loading }: StudentsProps) {
     const [filterValue, setFilterValue] = useState("");
     const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS));
-    const [statusFilter, setStatusFilter] = useState<Selection>(new Set(["Niet heringeschreven", "Ingeschreven"]));
+    const [statusFilter, setStatusFilter] = useState<Selection>(new Set(["Niet heringeschreven", "Ingeschreven", "Onder voorbehoud", "Uitgeschreven"]));
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
         column: "firstname",
@@ -148,7 +148,7 @@ export default function StudentsTable({ enrollments, levels, loading }: Students
                 );
             case "actions":
                 return (
-                    <div className="relative flex items-center gap-3">
+                    <div className="relative flex items-center justify-center gap-4">
                         <RowActions enrollment={enrollment} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
                     </div >
                 );

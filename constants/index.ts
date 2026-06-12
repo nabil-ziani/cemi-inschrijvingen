@@ -7,8 +7,8 @@ export const sidebarLinks = [
         icons: { default: House, active: HouseFill },
     },
     {
-        label: 'Nieuwe inschrijving',
-        route: '/enrollment/null?type=new',
+        label: 'Broer/zus inschrijven',
+        route: '/?sibling=1',
         icons: { default: CirclePlus, active: CirclePlusFill },
     },
 ] as const

@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@heroui/react'
+import { Button, Divider, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from '@heroui/react'
 import StudentsTable from './StudentsTable'
 import { EnrollmentWithStudentClass, Level } from '@/utils/types'
 import toast from 'react-hot-toast'
 import { createClient } from '@/utils/supabase/client'
+import { useRouter, useSearchParams } from 'next/navigation'
+import SiblingEnrollmentModal from './SiblingEnrollmentModal'
 
 interface StudentsProps {
     enrollments: EnrollmentWithStudentClass[],
@@ -18,6 +20,9 @@ const Students = ({ enrollments, levels }: StudentsProps) => {
     const [students, setStudents] = useState<Array<EnrollmentWithStudentClass>>(enrollments)
 
     const supabase = createClient();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const selectedValue = useMemo(
         () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
@@ -42,6 +47,24 @@ const Students = ({ enrollments, levels }: StudentsProps) => {
             toast.error('Oeps, er ging iets mis bij het ophalen van de inschrijvingen')
         }
     }, [selectedKeys])
+
+    useEffect(() => {
+        if (searchParams.get('sibling') === '1') {
+            onOpen();
+            return;
+        }
+
+        onClose();
+    }, [searchParams, onClose, onOpen])
+
+    const handleCloseSiblingModal = () => {
+        onClose();
+        router.replace('/');
+    }
+
+    const handleSelectSiblingStudent = (studentId: string) => {
+        router.push(`/enrollment/null?type=sibling&siblingOf=${studentId}`)
+    }
 
     return (
         <>
@@ -72,6 +95,12 @@ const Students = ({ enrollments, levels }: StudentsProps) => {
             <div className="flex w-full flex-col gap-8">
                 <StudentsTable enrollments={students} levels={levels} loading={loading} />
             </div>
+			<SiblingEnrollmentModal
+				isOpen={isOpen}
+				onClose={handleCloseSiblingModal}
+				enrollments={students}
+				onSelectStudent={handleSelectSiblingStudent}
+			/>
         </>
     )
 }

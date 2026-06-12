@@ -4,7 +4,7 @@ import { Tooltip } from '@heroui/react';
 import { EyeIcon } from './icons/EyeIcon';
 import DeleteTooltip from './DeleteTooltip';
 import { useRouter } from 'next/navigation';
-import { Edit3, UserCheck } from 'lucide-react';
+import { Edit3, UserCheck, UserPlus } from 'lucide-react';
 import { capitalize } from '@/lib/utils';
 
 type ModalType = "delete" | "enroll" | "payment" | "fail"
@@ -33,6 +33,14 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
         onOpen();
     }
 
+	const siblingAction = (
+		<Tooltip content="Broer/zus inschrijven">
+			<span onClick={() => router.push(`/enrollment/null?type=sibling&siblingOf=${enrollment.studentid}`)} className="text-lg text-default-400 cursor-pointer active:opacity-50">
+				<UserPlus strokeWidth={1} />
+			</span>
+		</Tooltip>
+	)
+
     if (enrollment.year == 2026 && enrollment.status == EnrollmentStatusEnum.Enum.Ingeschreven) {
         return (
             <>
@@ -41,6 +49,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
                         <Edit3 strokeWidth={1} />
                     </span>
                 </Tooltip>
+				{siblingAction}
                 <DeleteTooltip enrollment={enrollment} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
             </>
         )
@@ -54,6 +63,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
                         <EyeIcon strokeWidth={1} />
                     </span>
                 </Tooltip>
+				{siblingAction}
                 <DeleteTooltip enrollment={enrollment} disabled={true} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
             </>
         )
@@ -67,6 +77,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
                         <Edit3 strokeWidth={1} />
                     </span>
                 </Tooltip>
+				{siblingAction}
                 <DeleteTooltip enrollment={enrollment} disabled={true} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
             </>
         )
@@ -80,6 +91,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
                         <UserCheck strokeWidth={1} />
                     </span>
                 </Tooltip>
+				{siblingAction}
                 <DeleteTooltip enrollment={enrollment} disabled={true} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
             </>
         )
@@ -100,6 +112,7 @@ const RowActions = ({ enrollment, setSelectedStudent, setModalType, onOpen }: Ro
                     <UserCheck strokeWidth={1} />
                 </span>
             </Tooltip>
+			{siblingAction}
             <DeleteTooltip enrollment={enrollment} setSelectedStudent={setSelectedStudent} setModalType={setModalType} onOpen={onOpen} />
         </>
     )

@@ -4,15 +4,19 @@ import { SubmitButton } from './SubmitButton';
 import { EnrollmentStatusEnum, EnrollmentWithStudentClass } from '@/utils/types';
 
 interface EnrollmentButtonProps {
-    enrollment: EnrollmentWithStudentClass,
+    enrollment: EnrollmentWithStudentClass | null,
     loading: boolean,
-    type: string
+    type: string | null
 }
 
 const EnrollmentButton = ({ enrollment, loading, type }: EnrollmentButtonProps) => {
 
     // When navigating to enrollment page through sidebar, enrollment is null
     if (!enrollment) {
+        if (type === 'sibling') {
+            return <SubmitButton text={loading ? '' : 'Broer/zus inschrijven'} loading={loading} />
+        }
+
         return <SubmitButton text={loading ? '' : 'Inschrijven'} loading={loading} />
     }
 

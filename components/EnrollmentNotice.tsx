@@ -15,7 +15,7 @@ const EnrollmentNotice = ({ enrollment, type, currentLevel, newLevel, newEnrollm
 
     if (type === 'new') {
         return (
-            < Card className='my-4 py-4 px-5 xl:max-w-[1800px] bg-warning-50'>
+            <Card className='my-4 py-4 px-5 xl:max-w-[1800px] bg-warning-50'>
                 <CardHeader className='flex justify-between items-center'>
                     <div className='flex items-center'>
                         <h2 className='mr-6 font-medium leading-none text-warning-700'>
@@ -25,7 +25,7 @@ const EnrollmentNotice = ({ enrollment, type, currentLevel, newLevel, newEnrollm
                         </h2>
                     </div>
                 </CardHeader>
-            </Card >
+            </Card>
         )
     }
 
